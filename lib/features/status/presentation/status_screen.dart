@@ -42,7 +42,6 @@ class StatusScreen extends ConsumerStatefulWidget {
 class _StatusScreenState extends ConsumerState<StatusScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
-  late Future<List<String>> _filesFuture;
   List<String> _images = [];
   List<String> _videos = [];
   String? _selectedDirectory;
@@ -60,7 +59,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       setState(() {
-        _filesFuture = _loadFiles();
+        _loadFiles();
       });
     }
   }
@@ -74,7 +73,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
           // Now ref is accessible
           ref.refresh(statusNotifierProvider);
         }
-        _filesFuture = _loadFiles();
+        _loadFiles();
       });
     }
   }
@@ -89,53 +88,140 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Status Saver'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.image), text: 'Images'),
-            Tab(icon: Icon(Icons.videocam), text: 'Videos'),
-          ],
-        ),
+      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      body: SafeArea(
+        child: _selectedDirectory == null
+            ? Center(
+                child: ElevatedButton(
+                  onPressed: _requestAccess,
+                  child: const Text('Select Status Folder'),
+                ),
+              )
+            : Consumer(
+                builder: (context, ref, _) {
+                  final statusAsync = ref.watch(statusNotifierProvider);
+                  return RefreshIndicator(
+                    onRefresh: () async => ref.refresh(statusNotifierProvider),
+                    child: statusAsync.when(
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (error, stack) =>
+                          Center(child: Text('Error: $error')),
+                      data: (files) {
+                        _images =
+                            files.where(StatusRepository.isImage).toList();
+                        _videos =
+                            files.where(StatusRepository.isVideo).toList();
+                        return NestedScrollView(
+                          headerSliverBuilder: (context, innerBoxIsScrolled) =>
+                              [
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 60, 16, 0),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Status Saver',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontFamily: 'Geist',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Easily save any WhatsApp\nStatus to your local storage',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isDark
+                                            ? Colors.white54
+                                            : Colors.grey[600],
+                                        height: 1.4,
+                                        fontFamily: 'Geist',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Container(
+                                      height: 40,
+                                      padding: const EdgeInsets.all(4),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 48),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? Colors.grey[900]
+                                            : Colors.grey[100],
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: TabBar(
+                                        controller: _tabController,
+                                        indicator: BoxDecoration(
+                                          color: isDark
+                                              ? Colors.grey[800]
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.08),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        dividerColor: Colors.transparent,
+                                        indicatorSize: TabBarIndicatorSize.tab,
+                                        labelColor: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        unselectedLabelColor: isDark
+                                            ? Colors.white38
+                                            : Colors.grey[400],
+                                        labelStyle: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'Geist',
+                                        ),
+                                        unselectedLabelStyle: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'Geist',
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        labelPadding: EdgeInsets.zero,
+                                        tabs: const [
+                                          Tab(text: 'Images'),
+                                          Tab(text: 'Videos'),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                          body: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _buildMediaGrid(_images),
+                              _buildMediaGrid(_videos),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
       ),
-      body: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_selectedDirectory == null) {
-      return Center(
-        child: ElevatedButton(
-          onPressed: _requestAccess,
-          child: const Text('Select Status Folder'),
-        ),
-      );
-    }
-
-    return Consumer(
-      builder: (context, ref, _) {
-        final statusAsync = ref.watch(statusNotifierProvider);
-        return RefreshIndicator(
-          onRefresh: () async => ref.refresh(statusNotifierProvider),
-          child: statusAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(child: Text('Error: $error')),
-            data: (files) {
-              _images = files.where(StatusRepository.isImage).toList();
-              _videos = files.where(StatusRepository.isVideo).toList();
-              return TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildMediaGrid(_images),
-                  _buildMediaGrid(_videos),
-                ],
-              );
-            },
-          ),
-        );
-      },
     );
   }
 
@@ -144,22 +230,32 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
       return const Center(child: Text('No statuses found'));
     }
 
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-      ),
-      itemCount: uris.length,
-      itemBuilder: (context, index) => KeyedSubtree(
-        key: ValueKey(uris[index]),
-        child: Heroine(
-          tag: uris[index],
-          spring: Spring.bouncy,
-          flightShuttleBuilder: const FlipShuttleBuilder(),
-          child: _MediaThumbnail(uri: uris[index]),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.7,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => KeyedSubtree(
+                key: ValueKey(uris[index]),
+                child: Heroine(
+                  tag: uris[index],
+                  spring: Spring.bouncy,
+                  flightShuttleBuilder: const FlipShuttleBuilder(),
+                  child: _MediaThumbnail(uri: uris[index]),
+                ),
+              ),
+              childCount: uris.length,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -169,7 +265,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
     if (mounted && uri != null) {
       setState(() {
         _selectedDirectory = uri;
-        _filesFuture = _loadFiles();
+        _loadFiles();
       });
       // Now ref is accessible
       ref.refresh(statusNotifierProvider);
@@ -204,7 +300,7 @@ class _MediaThumbnail extends StatelessWidget {
     return GestureDetector(
       onTap: () => _openFullScreen(context),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         child: StatusRepository.isImage(uri)
             ? FutureBuilder<Uint8List>(
                 future: _loadImageBytes(),
