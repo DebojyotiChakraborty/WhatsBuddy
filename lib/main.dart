@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:whatsbuddy/core/theme/app_theme.dart';
 import 'package:whatsbuddy/features/contacts/data/contact_model.dart';
 import 'package:whatsbuddy/features/messaging/data/message_history_model.dart';
 import 'package:heroine/heroine.dart';
+import 'package:whatsbuddy/core/presentation/svg_icon.dart';
 
 import 'core/presentation/bottom_nav.dart';
 import 'features/contacts/presentation/contacts_screen.dart';
@@ -31,35 +33,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'WhatsBuddy',
       navigatorObservers: [HeroineController()],
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF075E54), // WhatsApp green
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF075E54),
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       home: const HomeNavigator(),
     );
   }
@@ -166,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: SvgIcon.asset('user_add_2_line', size: 24, color: Colors.white),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

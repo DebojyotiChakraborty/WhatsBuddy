@@ -49,6 +49,7 @@ dependencies:
   heroine: ^0.4.0
   springster: ^0.4.0
   dismissible_page: ^1.0.2
+  flutter_svg: ^2.0.10+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -109,3 +110,39 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  
+  # Add these assets
+  assets:
+    - assets/icons/chat_3_fill.svg
+    - assets/icons/chat_3_line.svg
+    - assets/icons/check_circle_line.svg
+    - assets/icons/contacts_2_line.svg
+    - assets/icons/delete_2_line.svg
+    - assets/icons/file_download_line.svg
+    - assets/icons/forbid_circle_line.svg
+    - assets/icons/history_line.svg
+    - assets/icons/phone_call_line.svg
+    - assets/icons/pic_fill.svg
+    - assets/icons/pic_line.svg
+    - assets/icons/right_line.svg
+    - assets/icons/sandglass_line.svg
+    - assets/icons/search_line.svg
+    - assets/icons/share_forward_line.svg
+    - assets/icons/user_add_2_line.svg
+    - assets/icons/whatsapp_fill.svg
+    - assets/icons/whatsapp_line.svg
+
+  
+
+  # Add these fonts
+  fonts:
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Geist-SemiBold.otf
+          weight: 600
+    - family: GeistMono
+      fonts:
+        - asset: assets/fonts/GeistMono-Regular.otf
+          weight: 400

@@ -5,9 +5,12 @@ import 'package:intl_phone_field/phone_number.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsbuddy/core/constants/app_constants.dart';
 import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
 
+import '../../contacts/data/contact_model.dart';
 import '../../messaging/data/messaging_repository.dart';
 import '../data/message_history_model.dart';
+import '../../../core/presentation/bottom_nav.dart';
 
 class MessagingScreen extends ConsumerStatefulWidget {
   const MessagingScreen({super.key});
@@ -67,6 +70,58 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
     }
   }
 
+  void _showSaveContactModal(BuildContext context) {
+    final nameController = TextEditingController();
+    final phoneNumber = _selectedNumber?.completeNumber ?? '';
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Contact Name',
+                hintText: 'Enter name for temporary contact',
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (nameController.text.isNotEmpty &&
+                        phoneNumber.isNotEmpty) {
+                      final contactsBox = Hive.box<Contact>('contacts');
+                      contactsBox.putAt(
+                          0,
+                          Contact(
+                            name: nameController.text,
+                            number: phoneNumber,
+                            createdAt: DateTime.now(),
+                          ));
+                      Navigator.pop(context);
+                      ref.read(navIndexProvider.notifier).state = 1;
+                    }
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,9 +150,23 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openWhatsAppChat,
-        child: const Icon(Icons.chat),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.chat),
+              label: const Text('Start Chat'),
+              onPressed: _openWhatsAppChat,
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.save_alt),
+              label: const Text('Save Temporarily'),
+              onPressed: () => _showSaveContactModal(context),
+            ),
+          ],
+        ),
       ),
     );
   }

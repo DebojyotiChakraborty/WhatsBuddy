@@ -5,6 +5,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsbuddy/core/presentation/svg_icon.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../data/contact_model.dart';
@@ -74,10 +75,6 @@ class ContactsScreen extends ConsumerWidget {
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddContactDialog(context),
-        child: const Icon(Icons.add),
       ),
     );
   }
@@ -186,7 +183,7 @@ class ContactsScreen extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: const Icon(Icons.message),
+            leading: SvgIcon.asset('user_add_2_line', size: 24),
             title: const Text('Message'),
             onTap: () {
               Navigator.pop(context);
@@ -194,12 +191,12 @@ class ContactsScreen extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.contact_page),
+            leading: SvgIcon.asset('user_add_2_line', size: 24),
             title: const Text('Save to Device'),
             onTap: () => _saveToDeviceContacts(context, contact),
           ),
           ListTile(
-            leading: const Icon(Icons.delete),
+            leading: SvgIcon.asset('user_add_2_line', size: 24),
             title: const Text('Delete'),
             onTap: () => _deleteContact(context, index),
           ),
