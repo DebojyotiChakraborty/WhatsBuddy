@@ -131,6 +131,7 @@ flutter:
     - assets/icons/user_add_2_line.svg
     - assets/icons/whatsapp_fill.svg
     - assets/icons/whatsapp_line.svg
+    - assets/data/country_dial_code.json
 
   
 

@@ -21,14 +21,13 @@ class BottomNavBar extends ConsumerWidget {
           label: 'Chats',
         ),
         BottomNavigationBarItem(
-          icon: SvgIcon.asset('contacts_2_line', size: 24),
-          activeIcon: SvgIcon.asset('contacts_2_line',
-              size: 24), // Add filled version if available
+          icon: SvgIcon.asset('hourglass_line', size: 24),
+          activeIcon: SvgIcon.asset('hourglass_fill', size: 24),
           label: 'Contacts',
         ),
         BottomNavigationBarItem(
-          icon: SvgIcon.asset('whatsapp_line', size: 24),
-          activeIcon: SvgIcon.asset('whatsapp_fill', size: 24),
+          icon: SvgIcon.asset('pic_line', size: 24),
+          activeIcon: SvgIcon.asset('pic_fill', size: 24),
           label: 'Status',
         ),
       ],

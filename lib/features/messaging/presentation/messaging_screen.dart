@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsbuddy/core/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 import 'package:hive/hive.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../core/presentation/widgets/action_button.dart';
 import '../../contacts/data/contact_model.dart';
 import '../../messaging/data/messaging_repository.dart';
 import '../data/message_history_model.dart';
 import '../../../core/presentation/bottom_nav.dart';
+import '../data/country_model.dart';
+import 'country_selector.dart';
 
 class MessagingScreen extends ConsumerStatefulWidget {
   const MessagingScreen({super.key});
@@ -21,19 +23,65 @@ class MessagingScreen extends ConsumerStatefulWidget {
 
 class _MessagingScreenState extends ConsumerState<MessagingScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  PhoneNumber? _selectedNumber;
+  Country? _selectedCountry;
+  List<Country> _countries = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCountries();
+  }
+
+  Future<void> _loadCountries() async {
+    try {
+      final countries = await Country.loadCountries();
+      if (mounted) {
+        final india = countries.firstWhere((c) => c.code == 'IN');
+        setState(() {
+          _countries = countries;
+          _selectedCountry = india;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showCountrySelector() {
+    if (_countries.isEmpty || _isLoading) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CountrySelector(
+        countries: _countries,
+        selectedCountry: _selectedCountry,
+        onSelect: (country) {
+          setState(() => _selectedCountry = country);
+        },
+      ),
+    );
+  }
 
   void _openWhatsAppChat() async {
-    final cleanNumber = _selectedNumber?.completeNumber ?? '';
+    if (_selectedCountry == null) return;
 
-    if (cleanNumber.isEmpty || !cleanNumber.startsWith('+')) {
+    final phoneNumber = _phoneController.text.trim();
+    if (phoneNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please enter a valid international number')),
+        const SnackBar(content: Text('Please enter a phone number')),
       );
       return;
     }
 
+    final cleanNumber = '${_selectedCountry!.dialCode}$phoneNumber';
     final url = Uri.parse('${AppConstants.whatsappUrlScheme}$cleanNumber');
 
     try {
@@ -71,8 +119,11 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
   }
 
   void _showSaveContactModal(BuildContext context) {
+    if (_selectedCountry == null) return;
+
     final nameController = TextEditingController();
-    final phoneNumber = _selectedNumber?.completeNumber ?? '';
+    final phoneNumber =
+        '${_selectedCountry!.dialCode}${_phoneController.text.trim()}';
 
     showModalBottomSheet(
       context: context,
@@ -100,14 +151,11 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   onPressed: () {
                     if (nameController.text.isNotEmpty &&
                         phoneNumber.isNotEmpty) {
-                      final contactsBox = Hive.box<Contact>('contacts');
-                      contactsBox.putAt(
-                          0,
-                          Contact(
-                            name: nameController.text,
-                            number: phoneNumber,
-                            createdAt: DateTime.now(),
-                          ));
+                      Hive.box<Contact>('contacts').add(Contact(
+                        name: nameController.text,
+                        number: phoneNumber,
+                        createdAt: DateTime.now(),
+                      ));
                       Navigator.pop(context);
                       ref.read(navIndexProvider.notifier).state = 1;
                     }
@@ -124,54 +172,141 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(title: const Text('New Message')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             children: [
-              IntlPhoneField(
-                controller: _phoneController,
-                initialCountryCode: 'IN',
-                disableLengthCheck: true,
-                showCountryFlag: false,
-                dropdownIcon: const Icon(Icons.arrow_drop_down),
-                searchText: 'Search country',
-                style: Theme.of(context).textTheme.bodyMedium,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(),
+              const SizedBox(height: 40),
+              // App Icon
+              SvgPicture.asset(
+                'assets/icons/whatsapp_line.svg',
+                width: 32,
+                height: 32,
+                colorFilter: ColorFilter.mode(
+                  Colors.green[400]!,
+                  BlendMode.srcIn,
                 ),
-                onChanged: (number) => _selectedNumber = number,
               ),
+              const SizedBox(height: 40),
+              // Country Code Selector
+              GestureDetector(
+                onTap: _showCountrySelector,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[800] : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isLoading)
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: isDark ? Colors.white70 : Colors.grey[600],
+                          ),
+                        )
+                      else if (_selectedCountry != null)
+                        Text(
+                          '${_selectedCountry!.dialCode} (${_selectedCountry!.name})',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDark ? Colors.white : Colors.grey[800],
+                            fontFamily: 'Geist',
+                          ),
+                        )
+                      else
+                        Text(
+                          'Select Country',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDark ? Colors.white54 : Colors.grey[400],
+                            fontFamily: 'Geist',
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Phone Input
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 16),
+                    SvgPicture.asset(
+                      'assets/icons/phone_call_line.svg',
+                      width: 20,
+                      height: 20,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? Colors.white70 : Colors.grey[600]!,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.grey[800],
+                          fontFamily: 'GeistMono',
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Enter phone number...',
+                          hintStyle: TextStyle(
+                            color: isDark ? Colors.white54 : Colors.grey[400],
+                            fontFamily: 'Geist',
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Action Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ActionButton(
+                    icon: Icons.schedule,
+                    label: 'Start Chat',
+                    onPressed: _openWhatsAppChat,
+                  ),
+                  const SizedBox(width: 16),
+                  ActionButton(
+                    icon: Icons.save_outlined,
+                    label: 'Save\nTemporarily',
+                    onPressed: () => _showSaveContactModal(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
               _buildHistorySection(context),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton.icon(
-              icon: const Icon(Icons.chat),
-              label: const Text('Start Chat'),
-              onPressed: _openWhatsAppChat,
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.save_alt),
-              label: const Text('Save Temporarily'),
-              onPressed: () => _showSaveContactModal(context),
-            ),
-          ],
         ),
       ),
     );
   }
 
   Widget _buildHistorySection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return FutureBuilder<List<MessageHistory>>(
       future: MessagingRepository.getHistory(),
       builder: (context, snapshot) {
@@ -180,50 +315,133 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
         }
 
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Text(
-                'Recent Messages',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/history_line.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    isDark ? Colors.white : Colors.grey[900]!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'History',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.grey[900],
+                    fontFamily: 'Geist',
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height: 16),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: snapshot.data!.length + 1,
+              itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                if (index == snapshot.data!.length) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.delete),
-                      label: const Text('Clear History'),
-                      onPressed: () async {
-                        await MessagingRepository.clearHistory();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('History cleared')),
-                        );
-                        if (mounted) setState(() {});
-                      },
-                    ),
-                  );
-                }
                 final history = snapshot.data![index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    title: Text(history.phoneNumber),
-                    subtitle: Text(
-                      DateFormat('MMM dd, yyyy - hh:mm a')
-                          .format(history.timestamp),
+                return Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[800] : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _openWhatsAppDirectly(history.phoneNumber),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/chat_3_line.svg',
+                              width: 20,
+                              height: 20,
+                              colorFilter: ColorFilter.mode(
+                                isDark ? Colors.white70 : Colors.grey[600]!,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    history.phoneNumber,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color:
+                                          isDark ? Colors.white : Colors.black,
+                                      fontFamily: 'GeistMono',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${DateFormat('hh:mm a').format(history.timestamp)} on ${DateFormat('dd-MM-yyyy').format(history.timestamp)}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isDark
+                                          ? Colors.white54
+                                          : Colors.grey[500],
+                                      fontFamily: 'Geist',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: isDark ? Colors.white54 : Colors.grey[400],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    onTap: () => _openWhatsAppDirectly(history.phoneNumber),
                   ),
                 );
               },
             ),
+            const SizedBox(height: 16),
+            Center(
+              child: TextButton.icon(
+                onPressed: () async {
+                  await MessagingRepository.clearHistory();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('History cleared')),
+                  );
+                  if (mounted) setState(() {});
+                },
+                icon: SvgPicture.asset(
+                  'assets/icons/delete_2_line.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    Colors.red[300]!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                label: Text(
+                  'Delete History',
+                  style: TextStyle(
+                    color: Colors.red[300],
+                    fontSize: 16,
+                    fontFamily: 'Geist',
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         );
       },

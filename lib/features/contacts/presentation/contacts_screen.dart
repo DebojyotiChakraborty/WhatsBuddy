@@ -20,7 +20,7 @@ class ContactsScreen extends ConsumerWidget {
       body: ValueListenableBuilder(
         valueListenable: Hive.box<Contact>('contacts').listenable(),
         builder: (context, Box<Contact> box, _) {
-          final contacts = box.values.toList();
+          final contacts = box.values.toList().reversed.toList();
           if (contacts.isEmpty) {
             return const Center(
               child: Text('No temporary contacts found'),
