@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/presentation/widgets/options_modal.dart';
 import '../data/contact_model.dart';
 
 class ContactsScreen extends ConsumerWidget {
@@ -306,70 +307,42 @@ class ContactsScreen extends ConsumerWidget {
   void _showContactOptions(BuildContext context, Contact contact, int index) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final box = Hive.box<Contact>('contacts');
-    // Find the actual index in the box for this contact
     final boxIndex = box.values.toList().indexOf(contact);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 8),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[700] : Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => OptionsModal(
+        title: 'Temporary Contact\nOptions',
+        options: [
+          OptionItem(
+            icon: null,
+            label: 'Add to device contacts',
+            onTap: () {
+              Navigator.pop(context);
+              _saveToDeviceContacts(context, contact);
+            },
+            isHorizontal: true,
           ),
-          ListTile(
-            leading: SvgPicture.asset(
-              'assets/icons/chat_3_line.svg',
+          OptionItem(
+            icon: SvgPicture.asset(
+              'assets/icons/whatsapp_line.svg',
               width: 24,
               height: 24,
               colorFilter: ColorFilter.mode(
-                isDark ? Colors.white70 : Colors.grey[600]!,
+                isDark ? Colors.white : Colors.grey[900]!,
                 BlendMode.srcIn,
               ),
             ),
-            title: Text(
-              'Message',
-              style: TextStyle(
-                fontFamily: 'Geist',
-                color: isDark ? Colors.white : Colors.black,
-              ),
-            ),
+            label: 'Start Chat',
             onTap: () {
               Navigator.pop(context);
               _openWhatsAppChat(context, contact.number);
             },
           ),
-          ListTile(
-            leading: SvgPicture.asset(
-              'assets/icons/user_add_2_line.svg',
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                isDark ? Colors.white70 : Colors.grey[600]!,
-                BlendMode.srcIn,
-              ),
-            ),
-            title: Text(
-              'Save to Device',
-              style: TextStyle(
-                fontFamily: 'Geist',
-                color: isDark ? Colors.white : Colors.black,
-              ),
-            ),
-            onTap: () => _saveToDeviceContacts(context, contact),
-          ),
-          ListTile(
-            leading: SvgPicture.asset(
+          OptionItem(
+            icon: SvgPicture.asset(
               'assets/icons/delete_2_line.svg',
               width: 24,
               height: 24,
@@ -378,21 +351,15 @@ class ContactsScreen extends ConsumerWidget {
                 BlendMode.srcIn,
               ),
             ),
-            title: Text(
-              'Delete',
-              style: TextStyle(
-                color: Colors.red[300],
-                fontFamily: 'Geist',
-              ),
-            ),
+            label: 'Delete',
             onTap: () {
               if (boxIndex != -1) {
                 box.deleteAt(boxIndex);
               }
               Navigator.pop(context);
             },
+            isDestructive: true,
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );

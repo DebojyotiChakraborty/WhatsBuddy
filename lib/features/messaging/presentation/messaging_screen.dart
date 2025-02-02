@@ -7,12 +7,13 @@ import 'package:hive/hive.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/presentation/widgets/action_button.dart';
+import '../../../core/presentation/widgets/options_modal.dart';
 import '../../contacts/data/contact_model.dart';
 import '../../messaging/data/messaging_repository.dart';
 import '../data/message_history_model.dart';
 import '../../../core/presentation/bottom_nav.dart';
 import '../data/country_model.dart';
-import 'country_selector.dart';
+import 'dial_code_modal.dart';
 
 class MessagingScreen extends ConsumerStatefulWidget {
   const MessagingScreen({super.key});
@@ -60,11 +61,15 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CountrySelector(
+      isDismissible: true,
+      enableDrag: true,
+      builder: (context) => DialCodeModal(
         countries: _countries,
         selectedCountry: _selectedCountry,
         onSelect: (country) {
-          setState(() => _selectedCountry = country);
+          if (mounted) {
+            setState(() => _selectedCountry = country);
+          }
         },
       ),
     );
@@ -127,45 +132,51 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Contact Name',
-                hintText: 'Enter name for temporary contact',
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty &&
-                        phoneNumber.isNotEmpty) {
-                      Hive.box<Contact>('contacts').add(Contact(
-                        name: nameController.text,
-                        number: phoneNumber,
-                        createdAt: DateTime.now(),
-                      ));
-                      Navigator.pop(context);
-                      ref.read(navIndexProvider.notifier).state = 1;
-                    }
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            ),
-          ],
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => OptionsModal(
+        title: 'Save\nTemporary Contact',
+        inputController: nameController,
+        inputHint: 'Enter contact name...',
+        inputIcon: Icon(
+          Icons.person_outline,
+          size: 20,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white54
+              : Colors.grey[600],
         ),
+        options: [
+          OptionItem(
+            icon: Icon(
+              Icons.close,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.grey[900],
+            ),
+            label: 'Cancel',
+            onTap: () => Navigator.pop(context),
+          ),
+          OptionItem(
+            icon: Icon(
+              Icons.check,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.grey[900],
+            ),
+            label: 'Save',
+            onTap: () {
+              if (nameController.text.isNotEmpty && phoneNumber.isNotEmpty) {
+                Hive.box<Contact>('contacts').add(Contact(
+                  name: nameController.text,
+                  number: phoneNumber,
+                  createdAt: DateTime.now(),
+                ));
+                Navigator.pop(context);
+                ref.read(navIndexProvider.notifier).state = 1;
+              }
+            },
+          ),
+        ],
       ),
     );
   }
