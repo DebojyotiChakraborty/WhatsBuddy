@@ -244,12 +244,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
             delegate: SliverChildBuilderDelegate(
               (context, index) => KeyedSubtree(
                 key: ValueKey(uris[index]),
-                child: Heroine(
-                  tag: uris[index],
-                  spring: Spring.bouncy,
-                  flightShuttleBuilder: const FlipShuttleBuilder(),
-                  child: _MediaThumbnail(uri: uris[index]),
-                ),
+                child: _MediaThumbnail(uri: uris[index]),
               ),
               childCount: uris.length,
             ),
@@ -297,26 +292,53 @@ class _MediaThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => _openFullScreen(context),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: StatusRepository.isImage(uri)
-            ? FutureBuilder<Uint8List>(
-                future: _loadImageBytes(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    return Image.memory(
-                      snapshot.data!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                    );
-                  }
-                  return Container(color: Colors.grey[800]);
-                },
-              )
-            : _VideoPreview(uri: uri),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Heroine(
+          tag: uri,
+          spring: Spring.bouncy,
+          flightShuttleBuilder: const FlipShuttleBuilder(),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: StatusRepository.isImage(uri)
+                ? FutureBuilder<Uint8List>(
+                    future: _loadImageBytes(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        return Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        );
+                      }
+                      return Container(
+                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                        child: Center(
+                          child: Icon(
+                            Icons.image,
+                            color: isDark ? Colors.grey[600] : Colors.grey[400],
+                            size: 32,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : _VideoPreview(uri: uri),
+          ),
+        ),
       ),
     );
   }
@@ -324,11 +346,15 @@ class _MediaThumbnail extends StatelessWidget {
   void _openFullScreen(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => FullScreenViewer(
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            FullScreenViewer(
           uri: uri,
           isVideo: StatusRepository.isVideo(uri),
         ),
+        transitionDuration: const Duration(milliseconds: 500),
+        reverseTransitionDuration: const Duration(milliseconds: 500),
       ),
     );
   }
