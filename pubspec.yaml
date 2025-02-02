@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.3.6
+  flutter_animate: ^4.5.0
   hive_flutter: ^1.1.0
   url_launcher: ^6.1.11
   intl_phone_field: ^3.2.0
@@ -125,6 +126,7 @@ flutter:
     - assets/icons/pic_fill.svg
     - assets/icons/pic_line.svg
     - assets/icons/right_line.svg
+    - assets/icons/sandglass_fill.svg
     - assets/icons/sandglass_line.svg
     - assets/icons/search_line.svg
     - assets/icons/share_forward_line.svg

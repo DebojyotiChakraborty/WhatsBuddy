@@ -6,6 +6,7 @@ import 'package:whatsbuddy/features/contacts/data/contact_model.dart';
 import 'package:whatsbuddy/features/messaging/data/message_history_model.dart';
 import 'package:heroine/heroine.dart';
 import 'package:whatsbuddy/core/presentation/svg_icon.dart';
+import 'package:whatsbuddy/core/presentation/page_transition.dart';
 
 import 'core/presentation/bottom_nav.dart';
 import 'features/contacts/presentation/contacts_screen.dart';
@@ -49,11 +50,19 @@ class HomeNavigator extends ConsumerWidget {
     final screens = [
       const MessagingScreen(),
       const ContactsScreen(),
-      const StatusScreen(), // Add StatusScreen implementation
+      const StatusScreen(),
     ];
 
     return Scaffold(
-      body: screens[currentIndex],
+      body: IndexedStack(
+        index: currentIndex,
+        children: screens.asMap().entries.map((entry) {
+          return PageTransition(
+            isActive: currentIndex == entry.key,
+            child: entry.value,
+          );
+        }).toList(),
+      ),
       bottomNavigationBar: const BottomNavBar(),
     );
   }
