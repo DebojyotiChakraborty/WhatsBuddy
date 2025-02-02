@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:heroine/heroine.dart';
+import '../../../core/presentation/widgets/action_button.dart';
 
 class FullScreenViewer extends StatefulWidget {
   final String uri;
@@ -199,16 +200,16 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _ActionButton(
-                          onPressed: _saveToDownloads,
+                        ActionButton(
                           icon: Icons.file_download_outlined,
                           label: 'Save file',
+                          onPressed: _saveToDownloads,
                         ),
                         const SizedBox(width: 16),
-                        _ActionButton(
-                          onPressed: _shareFile,
+                        ActionButton(
                           icon: Icons.share_outlined,
                           label: 'Share',
+                          onPressed: _shareFile,
                         ),
                       ],
                     ),
@@ -272,68 +273,6 @@ class _FullScreenViewerState extends State<FullScreenViewer>
     return Image.memory(
       _imageBytes!,
       fit: BoxFit.contain,
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final IconData icon;
-  final String label;
-
-  const _ActionButton({
-    required this.onPressed,
-    required this.icon,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: 24,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
