@@ -5,8 +5,6 @@ import 'package:whatsbuddy/core/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart'
-    show CupertinoRadii;
 import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 import '../../../core/presentation/widgets/action_button.dart';

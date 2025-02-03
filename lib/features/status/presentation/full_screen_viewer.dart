@@ -26,10 +26,10 @@ class _FullScreenViewerState extends State<FullScreenViewer>
   Uint8List? _imageBytes;
   bool _isPlaying = false;
   late AnimationController _buttonAnimationController;
-  late Animation<Offset> _buttonSlideAnimation;
-  late Animation<double> _buttonOpacityAnimation;
   bool _isVideoInitialized = false;
   bool _isDismissing = false;
+  final _spring = Spring.bouncy;
+  bool _canDismiss = false;
 
   @override
   void initState() {
@@ -45,43 +45,31 @@ class _FullScreenViewerState extends State<FullScreenViewer>
   void _setupAnimations() {
     _buttonAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 300),
+      reverseDuration: const Duration(milliseconds: 100),
     );
 
-    _buttonSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _buttonAnimationController,
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeIn,
-      ),
-    );
-
-    _buttonOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _buttonAnimationController,
-        curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
-        reverseCurve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-      ),
-    );
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        _buttonAnimationController.forward();
-      }
-    });
+    if (!widget.isVideo) {
+      _buttonAnimationController.forward().then((_) {
+        if (mounted) setState(() => _canDismiss = true);
+      });
+    }
   }
 
-  void _startDismissing() {
+  void _startDismissing() async {
     if (!_isDismissing && mounted) {
       setState(() => _isDismissing = true);
-      _buttonAnimationController.reverse();
+      await _buttonAnimationController.reverse();
+      if (mounted) {
+        setState(() => _canDismiss = true);
+      }
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    _startDismissing();
+    await Future.delayed(const Duration(milliseconds: 50));
+    return true;
   }
 
   @override
@@ -96,12 +84,16 @@ class _FullScreenViewerState extends State<FullScreenViewer>
   }
 
   Future<void> _loadImage() async {
-    final bytes = await _channel
-        .invokeMethod<Uint8List>('getFileBytes', {'uri': widget.uri});
-    if (mounted) {
-      setState(() {
-        _imageBytes = bytes;
-      });
+    try {
+      final bytes = await _channel
+          .invokeMethod<Uint8List>('getFileBytes', {'uri': widget.uri});
+      if (mounted) {
+        setState(() {
+          _imageBytes = bytes;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading image: $e');
     }
   }
 
@@ -159,11 +151,15 @@ class _FullScreenViewerState extends State<FullScreenViewer>
           _isVideoInitialized = true;
           _isPlaying = false;
         });
+        await _buttonAnimationController.forward();
+        if (mounted) setState(() => _canDismiss = true);
       }
     } catch (error) {
+      debugPrint('Error initializing video: $error');
       if (mounted) {
         setState(() {
           _isVideoInitialized = false;
+          _canDismiss = true;
         });
       }
     }
@@ -171,23 +167,40 @@ class _FullScreenViewerState extends State<FullScreenViewer>
 
   @override
   Widget build(BuildContext context) {
-    return ReactToHeroineDismiss(
-      builder: (context, progress, offset, child) {
-        final opacity = 1 - progress;
-        if (progress > 0.1 && !_isDismissing) {
-          _startDismissing();
-        }
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: opacity * 20,
-                sigmaY: opacity * 20,
-              ),
-              child: Container(
-                color: Colors.black.withOpacity(0.5 * opacity),
-                child: SafeArea(
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: ReactToHeroineDismiss(
+        builder: (context, progress, offset, child) {
+          final actualProgress = _canDismiss ? progress : 0.0;
+          final opacity = (1 - actualProgress).clamp(0.0, 1.0);
+          final blurSigma = (1 - actualProgress) * 20.0;
+
+          if (actualProgress > 0.1 && !_isDismissing) {
+            _startDismissing();
+          }
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
+              fit: StackFit.expand,
+              children: [
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                  builder: (context, value, child) {
+                    return BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: blurSigma * value,
+                        sigmaY: blurSigma * value,
+                      ),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.6 * opacity * value),
+                      ),
+                    );
+                  },
+                ),
+                SafeArea(
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -206,7 +219,7 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                                 key: ValueKey(widget.uri),
                                 child: Heroine(
                                   tag: widget.uri,
-                                  spring: Spring.bouncy,
+                                  spring: _spring,
                                   flightShuttleBuilder:
                                       const FlipShuttleBuilder(),
                                   child: ClipRRect(
@@ -221,52 +234,69 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                           ),
                         ),
                       ),
-                      Positioned(
-                        bottom: 40,
-                        left: 0,
-                        right: 0,
-                        child: AnimatedBuilder(
-                          animation: _buttonAnimationController,
-                          builder: (context, child) => FadeTransition(
-                            opacity: _buttonOpacityAnimation,
-                            child: SlideTransition(
-                              position: _buttonSlideAnimation,
-                              child: child,
+                      AnimatedBuilder(
+                        animation: _buttonAnimationController,
+                        builder: (context, child) {
+                          final value = _buttonAnimationController.value;
+                          final yOffset = (1 - value) * 120;
+                          final scale = 0.8 + (value * 0.2);
+                          final buttonOpacity = value.clamp(0.0, 1.0);
+
+                          return Positioned(
+                            bottom: 40,
+                            left: 0,
+                            right: 0,
+                            child: Transform.translate(
+                              offset: Offset(0, yOffset),
+                              child: Transform.scale(
+                                scale: scale,
+                                child: Opacity(
+                                  opacity: buttonOpacity,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ActionButton(
+                                        icon: Icons.file_download_outlined,
+                                        label: 'Save file',
+                                        onPressed: _saveToDownloads,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      ActionButton(
+                                        icon: Icons.share_outlined,
+                                        label: 'Share',
+                                        onPressed: _shareFile,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ActionButton(
-                                icon: Icons.file_download_outlined,
-                                label: 'Save file',
-                                onPressed: _saveToDownloads,
-                              ),
-                              const SizedBox(width: 16),
-                              ActionButton(
-                                icon: Icons.share_outlined,
-                                label: 'Share',
-                                onPressed: _shareFile,
-                              ),
-                            ],
-                          ),
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
   Widget _buildVideoPlayer() {
     if (!_isVideoInitialized || _controller == null) {
-      return const Center(child: CircularProgressIndicator());
+      return Container(
+        color: Colors.black,
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        ),
+      );
     }
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -281,23 +311,20 @@ class _FullScreenViewerState extends State<FullScreenViewer>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(
-            color: Colors.transparent,
-            child: AspectRatio(
-              aspectRatio: _controller!.value.aspectRatio,
-              child: VideoPlayer(_controller!),
-            ),
+          AspectRatio(
+            aspectRatio: _controller!.value.aspectRatio,
+            child: VideoPlayer(_controller!),
           ),
           if (!_isPlaying)
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.3),
                 shape: BoxShape.circle,
               ),
               padding: const EdgeInsets.all(8),
               child: Icon(
-                Icons.play_circle_outline,
-                size: 80,
+                Icons.play_arrow_rounded,
+                size: 64,
                 color: Colors.white.withOpacity(0.9),
               ),
             ),
@@ -308,7 +335,14 @@ class _FullScreenViewerState extends State<FullScreenViewer>
 
   Widget _buildImage() {
     if (_imageBytes == null) {
-      return const Center(child: CircularProgressIndicator());
+      return Container(
+        color: Colors.black,
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        ),
+      );
     }
     return Image.memory(
       _imageBytes!,
