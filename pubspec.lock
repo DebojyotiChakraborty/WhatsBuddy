@@ -185,6 +185,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  cupertino_rounded_corners:
+    dependency: "direct main"
+    description:
+      name: cupertino_rounded_corners
+      sha256: "265b7160573748ddd80e509658a58981564857864ea99052f876c2be235e066a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   dart_style:
     dependency: transitive
     description:

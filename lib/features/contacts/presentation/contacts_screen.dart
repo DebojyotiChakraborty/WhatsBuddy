@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/presentation/widgets/options_modal.dart';
+import '../../../core/theme/app_theme.dart';
 import '../data/contact_model.dart';
 
 class ContactsScreen extends ConsumerWidget {
@@ -19,204 +20,209 @@ class ContactsScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
-      body: ValueListenableBuilder(
-        valueListenable: Hive.box<Contact>('contacts').listenable(),
-        builder: (context, Box<Contact> box, _) {
-          final contacts = box.values.toList().reversed.toList();
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              // Calculate if content needs scrolling
-              const headerHeight = 150.0; // Approximate height of header
-              const itemHeight =
-                  88.0; // Height of each contact item (including margins)
-              final totalContentHeight =
-                  headerHeight + (contacts.length * itemHeight);
-              final needsScrolling = totalContentHeight > constraints.maxHeight;
+      body: SafeArea(
+        child: ValueListenableBuilder(
+          valueListenable: Hive.box<Contact>('contacts').listenable(),
+          builder: (context, Box<Contact> box, _) {
+            final contacts = box.values.toList().reversed.toList();
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                // Calculate if content needs scrolling
+                const headerHeight = 150.0; // Approximate height of header
+                const itemHeight =
+                    88.0; // Height of each contact item (including margins)
+                final totalContentHeight =
+                    headerHeight + (contacts.length * itemHeight);
+                final needsScrolling =
+                    totalContentHeight > constraints.maxHeight;
 
-              return CustomScrollView(
-                physics: needsScrolling
-                    ? const AlwaysScrollableScrollPhysics()
-                    : const NeverScrollableScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 60, 16, 0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Temporary Contacts',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : Colors.black,
-                              fontFamily: 'Geist',
+                return NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 60, 16, 0),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Temporary Contacts',
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Temporary Contacts are\nauto-deleted after 24 hrs',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isDark ? Colors.white54 : Colors.grey[600],
-                              height: 1.4,
-                              fontFamily: 'Geist',
+                            const SizedBox(height: 8),
+                            Text(
+                              'Temporary Contacts are\nauto-deleted after 24 hrs',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .extension<AppThemeExtension>()
+                                  ?.secondaryText
+                                  .copyWith(
+                                    height: 1.4,
+                                  ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (contacts.isEmpty)
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(
-                        child: Text(
-                          'No temporary contacts found',
-                          style: TextStyle(
-                            color: isDark ? Colors.white54 : Colors.grey[600],
-                            fontFamily: 'Geist',
-                          ),
+                            const SizedBox(height: 24),
+                          ],
                         ),
                       ),
-                    )
-                  else
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final contact = contacts[index];
-                          return Dismissible(
-                            key: ValueKey(
-                                contact.number + contact.createdAt.toString()),
-                            direction: DismissDirection.endToStart,
-                            confirmDismiss: (direction) async {
-                              return await showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Delete Contact?'),
-                                  content: const Text(
-                                      'This will remove the temporary contact'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: const Text('Delete'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            background: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.red[400],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 20),
-                              child: const Icon(Icons.delete_outline,
-                                  color: Colors.white),
+                    ),
+                  ],
+                  body: CustomScrollView(
+                    physics: needsScrolling
+                        ? const AlwaysScrollableScrollPhysics()
+                        : const NeverScrollableScrollPhysics(),
+                    slivers: [
+                      if (contacts.isEmpty)
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: Text(
+                              'No temporary contacts found',
+                              style: Theme.of(context)
+                                  .extension<AppThemeExtension>()
+                                  ?.secondaryText,
                             ),
-                            onDismissed: (direction) {
-                              // Find the actual index in the box
-                              final boxIndex =
-                                  box.values.toList().indexOf(contact);
-                              if (boxIndex != -1) {
-                                box.deleteAt(boxIndex);
-                              }
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isDark ? Colors.grey[800] : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () => _showContactOptions(
-                                      context, contact, index),
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/user_add_2_line.svg',
-                                          width: 20,
-                                          height: 20,
-                                          colorFilter: ColorFilter.mode(
-                                            isDark
-                                                ? Colors.white70
-                                                : Colors.grey[600]!,
-                                            BlendMode.srcIn,
-                                          ),
+                          ),
+                        )
+                      else
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final contact = contacts[index];
+                              return Dismissible(
+                                key: ValueKey(contact.number +
+                                    contact.createdAt.toString()),
+                                direction: DismissDirection.endToStart,
+                                confirmDismiss: (direction) async {
+                                  return await showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Delete Contact?'),
+                                      content: const Text(
+                                          'This will remove the temporary contact'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text('Cancel'),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                contact.name,
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: isDark
-                                                      ? Colors.white
-                                                      : Colors.black,
-                                                  fontFamily: 'Geist',
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                contact.number,
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: isDark
-                                                      ? Colors.white54
-                                                      : Colors.grey[600],
-                                                  fontFamily: 'GeistMono',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Text(
-                                          _formatTimeLeft(contact.createdAt),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: isDark
-                                                ? Colors.white54
-                                                : Colors.grey[600],
-                                            fontFamily: 'Geist',
-                                          ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text('Delete'),
                                         ),
                                       ],
                                     ),
+                                  );
+                                },
+                                background: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.red[400],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: const Icon(Icons.delete_outline,
+                                      color: Colors.white),
+                                ),
+                                onDismissed: (direction) {
+                                  // Find the actual index in the box
+                                  final boxIndex =
+                                      box.values.toList().indexOf(contact);
+                                  if (boxIndex != -1) {
+                                    box.deleteAt(boxIndex);
+                                  }
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey[800]
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () => _showContactOptions(
+                                          context, contact, index),
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16),
+                                        child: Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                              'assets/icons/user_add_2_line.svg',
+                                              width: 20,
+                                              height: 20,
+                                              colorFilter: ColorFilter.mode(
+                                                isDark
+                                                    ? Colors.white70
+                                                    : Colors.grey[600]!,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    contact.name,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: isDark
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                      fontFamily: 'Geist',
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    contact.number,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: isDark
+                                                          ? Colors.white54
+                                                          : Colors.grey[600],
+                                                      fontFamily: 'GeistMono',
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Text(
+                                              _formatTimeLeft(
+                                                  contact.createdAt),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: isDark
+                                                    ? Colors.white54
+                                                    : Colors.grey[600],
+                                                fontFamily: 'Geist',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                        childCount: contacts.length,
-                      ),
-                    ),
-                ],
-              );
-            },
-          );
-        },
+                              );
+                            },
+                            childCount: contacts.length,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

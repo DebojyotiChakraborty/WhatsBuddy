@@ -5,9 +5,13 @@ import 'package:whatsbuddy/core/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart'
+    show CupertinoRadii;
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 import '../../../core/presentation/widgets/action_button.dart';
 import '../../../core/presentation/widgets/options_modal.dart';
+import '../../../core/presentation/widgets/custom_text_field.dart';
 import '../../contacts/data/contact_model.dart';
 import '../../messaging/data/messaging_repository.dart';
 import '../data/message_history_model.dart';
@@ -209,9 +213,9 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: isDark ? Colors.grey[800] : Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    shape: SquircleBorder(radius: BorderRadius.circular(24)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -251,42 +255,28 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
               // Phone Input
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 16),
-                    SvgPicture.asset(
-                      'assets/icons/phone_call_line.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter: ColorFilter.mode(
-                        isDark ? Colors.white70 : Colors.grey[600]!,
-                        BlendMode.srcIn,
-                      ),
+                child: CustomTextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  backgroundColor: isDark ? Colors.grey[800] : Colors.white,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.grey[800],
+                    fontFamily: 'GeistMono',
+                  ),
+                  hintText: 'Enter phone number...',
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.grey[400],
+                    fontFamily: 'Geist',
+                  ),
+                  prefixIcon: SvgPicture.asset(
+                    'assets/icons/phone_call_line.svg',
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      isDark ? Colors.white70 : Colors.grey[600]!,
+                      BlendMode.srcIn,
                     ),
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : Colors.grey[800],
-                          fontFamily: 'GeistMono',
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Enter phone number...',
-                          hintStyle: TextStyle(
-                            color: isDark ? Colors.white54 : Colors.grey[400],
-                            fontFamily: 'Geist',
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(16),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -361,14 +351,16 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                 return Container(
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: isDark ? Colors.grey[800] : Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    shape: SquircleBorder(radius: BorderRadius.circular(24)),
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => _openWhatsAppDirectly(history.phoneNumber),
+                      customBorder:
+                          SquircleBorder(radius: BorderRadius.circular(24)),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(

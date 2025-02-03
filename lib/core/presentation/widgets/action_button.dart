@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 class ActionButton extends StatelessWidget {
   final IconData? icon;
@@ -24,15 +25,15 @@ class ActionButton extends StatelessWidget {
       return Container(
         width: double.infinity,
         height: 56,
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: isDark ? Colors.grey[800] : Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
+          shape: SquircleBorder(radius: BorderRadius.circular(24)),
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onPressed,
-            borderRadius: BorderRadius.circular(12),
+            customBorder: SquircleBorder(radius: BorderRadius.circular(24)),
             child: Center(
               child: Text(
                 label,
@@ -51,10 +52,10 @@ class ActionButton extends StatelessWidget {
     return Container(
       width: 100,
       height: 100,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: isDark ? Colors.grey[800] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        shape: SquircleBorder(radius: BorderRadius.circular(32)),
+        shadows: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
@@ -66,7 +67,7 @@ class ActionButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(16),
+          customBorder: SquircleBorder(radius: BorderRadius.circular(32)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

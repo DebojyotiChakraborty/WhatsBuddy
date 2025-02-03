@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../data/country_model.dart';
+import '../../../core/presentation/widgets/custom_text_field.dart';
+import '../../../core/theme/app_theme.dart';
 
 class DialCodeModal extends StatefulWidget {
   final List<Country> countries;
@@ -66,52 +68,20 @@ class _DialCodeModalState extends State<DialCodeModal> {
             Text(
               'Select Country\nDial Code',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-                color: isDark ? Colors.white : Colors.black,
-                fontFamily: 'Geist',
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 24),
-            Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 12),
-                  Icon(
-                    Icons.search,
-                    size: 20,
-                    color: isDark ? Colors.white54 : Colors.grey[600],
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                        fontSize: 16,
-                        fontFamily: 'Geist',
-                      ),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        hintText: 'Search...',
-                        hintStyle: TextStyle(
-                          color: isDark ? Colors.white38 : Colors.grey[400],
-                          fontSize: 16,
-                          fontFamily: 'Geist',
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ),
-                ],
+            CustomTextField(
+              controller: _searchController,
+              hintText: 'Search...',
+              backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
+              style: Theme.of(context).textTheme.bodyLarge,
+              hintStyle:
+                  Theme.of(context).extension<AppThemeExtension>()?.hintStyle,
+              prefixIcon: Icon(
+                Icons.search,
+                size: 20,
+                color: isDark ? Colors.white54 : Colors.grey[600],
               ),
             ),
             const SizedBox(height: 24),
@@ -141,23 +111,15 @@ class _DialCodeModalState extends State<DialCodeModal> {
                               width: 56,
                               child: Text(
                                 country.dialCode,
-                                style: TextStyle(
-                                  color: isDark
-                                      ? Colors.white54
-                                      : Colors.grey[600],
-                                  fontSize: 14,
-                                  fontFamily: 'GeistMono',
-                                ),
+                                style: Theme.of(context)
+                                    .extension<AppThemeExtension>()
+                                    ?.monoText,
                               ),
                             ),
                             Expanded(
                               child: Text(
                                 country.name,
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.black,
-                                  fontSize: 16,
-                                  fontFamily: 'Geist',
-                                ),
+                                style: Theme.of(context).textTheme.bodyLarge,
                               ),
                             ),
                           ],

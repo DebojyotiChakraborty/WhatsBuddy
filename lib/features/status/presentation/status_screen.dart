@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 import '../data/status_repository.dart';
 import './full_screen_viewer.dart';
 import 'package:flutter/services.dart';
@@ -296,9 +297,9 @@ class _MediaThumbnail extends StatelessWidget {
     return GestureDetector(
       onTap: () => _openFullScreen(context),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
+        decoration: ShapeDecoration(
+          shape: SquircleBorder(radius: BorderRadius.circular(32)),
+          shadows: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 8,
@@ -310,8 +311,10 @@ class _MediaThumbnail extends StatelessWidget {
           tag: uri,
           spring: Spring.bouncy,
           flightShuttleBuilder: const FlipShuttleBuilder(),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+          child: ClipPath(
+            clipper: ShapeBorderClipper(
+              shape: SquircleBorder(radius: BorderRadius.circular(32)),
+            ),
             child: StatusRepository.isImage(uri)
                 ? FutureBuilder<Uint8List>(
                     future: _loadImageBytes(),

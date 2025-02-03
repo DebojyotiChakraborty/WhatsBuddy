@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static const String fontGeist = 'Geist';
+  static const String fontGeistMono = 'GeistMono';
+
   // Light Theme Colors
-  static const _primaryLight = Color.fromARGB(255, 0, 0, 0); // WhatsApp green
+  static const _primaryLight = Color.fromARGB(255, 0, 0, 0);
   static const _surfaceLight = Color(0xFFFFFFFF);
   static const _backgroundLight = Color(0xFFF5F5F5);
   static const _textLight = Color(0xFF1A1A1A);
-  static const _secondaryLight =
-      Color.fromARGB(255, 0, 0, 0); // WhatsApp dark green
+  static const _secondaryLight = Color.fromARGB(255, 0, 0, 0);
+  static final _hintLight = const Color(0xFF1A1A1A).withOpacity(0.35);
+  static final _secondaryTextLight = const Color(0xFF1A1A1A).withOpacity(0.6);
 
   // Dark Theme Colors
   static const _primaryDark = Color.fromARGB(255, 255, 255, 255);
@@ -15,6 +19,8 @@ class AppTheme {
   static const _backgroundDark = Color(0xFF000000);
   static const _textDark = Color(0xFFFFFFFF);
   static const _secondaryDark = Color.fromARGB(255, 255, 255, 255);
+  static final _hintDark = const Color(0xFFFFFFFF).withOpacity(0.35);
+  static final _secondaryTextDark = const Color(0xFFFFFFFF).withOpacity(0.54);
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -28,38 +34,83 @@ class AppTheme {
         surface: _surfaceLight,
         onSurface: _textLight,
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontFamily: 'Geist',
-          fontWeight: FontWeight.w700,
+      textTheme: TextTheme(
+        // Display styles
+        displayLarge: const TextStyle(
+          fontFamily: fontGeist,
           fontSize: 24,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
           color: _textLight,
         ),
-        displayMedium: TextStyle(
-          fontFamily: 'Geist',
-          fontWeight: FontWeight.w600,
-          fontSize: 20,
+        // Title styles
+        titleLarge: const TextStyle(
+          fontFamily: fontGeist,
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          height: 1.1,
+          letterSpacing: -0.5,
           color: _textLight,
         ),
-        bodyLarge: TextStyle(
-          fontFamily: 'Geist',
-          fontWeight: FontWeight.w600,
+        // Body styles
+        bodyLarge: const TextStyle(
+          fontFamily: fontGeist,
           fontSize: 16,
+          fontWeight: FontWeight.w500,
           color: _textLight,
         ),
-        bodyMedium: TextStyle(
-          fontFamily: 'Geist',
+        bodyMedium: const TextStyle(
+          fontFamily: fontGeist,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: _textLight,
+        ),
+        // Label styles
+        labelLarge: const TextStyle(
+          fontFamily: fontGeist,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
-          fontSize: 14,
           color: _textLight,
         ),
-        labelLarge: TextStyle(
-          fontFamily: 'GeistMono',
-          fontWeight: FontWeight.w400,
+        labelMedium: const TextStyle(
+          fontFamily: fontGeist,
           fontSize: 14,
+          fontWeight: FontWeight.w600,
+          height: 1.2,
           color: _textLight,
+        ),
+        // Mono styles
+        labelSmall: TextStyle(
+          fontFamily: fontGeistMono,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: _secondaryTextLight,
         ),
       ),
+      // Additional text styles that aren't part of the standard textTheme
+      extensions: [
+        AppThemeExtension(
+          hintStyle: TextStyle(
+            fontFamily: fontGeist,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: _hintLight,
+            letterSpacing: -0.2,
+          ),
+          secondaryText: TextStyle(
+            fontFamily: fontGeist,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: _secondaryTextLight,
+          ),
+          monoText: TextStyle(
+            fontFamily: fontGeistMono,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: _secondaryTextLight,
+          ),
+        ),
+      ],
       iconTheme: const IconThemeData(
         color: _primaryLight,
         size: 24,
@@ -115,38 +166,83 @@ class AppTheme {
         surface: _surfaceDark,
         onSurface: _textDark,
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontFamily: 'Geist',
-          fontWeight: FontWeight.w700,
+      textTheme: TextTheme(
+        // Display styles
+        displayLarge: const TextStyle(
+          fontFamily: fontGeist,
           fontSize: 24,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
           color: _textDark,
         ),
-        displayMedium: TextStyle(
-          fontFamily: 'Geist',
-          fontWeight: FontWeight.w600,
-          fontSize: 20,
+        // Title styles
+        titleLarge: const TextStyle(
+          fontFamily: fontGeist,
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          height: 1.1,
+          letterSpacing: -0.5,
           color: _textDark,
         ),
-        bodyLarge: TextStyle(
-          fontFamily: 'Geist',
-          fontWeight: FontWeight.w600,
+        // Body styles
+        bodyLarge: const TextStyle(
+          fontFamily: fontGeist,
           fontSize: 16,
+          fontWeight: FontWeight.w500,
           color: _textDark,
         ),
-        bodyMedium: TextStyle(
-          fontFamily: 'Geist',
+        bodyMedium: const TextStyle(
+          fontFamily: fontGeist,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: _textDark,
+        ),
+        // Label styles
+        labelLarge: const TextStyle(
+          fontFamily: fontGeist,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
-          fontSize: 14,
           color: _textDark,
         ),
-        labelLarge: TextStyle(
-          fontFamily: 'GeistMono',
-          fontWeight: FontWeight.w400,
+        labelMedium: const TextStyle(
+          fontFamily: fontGeist,
           fontSize: 14,
+          fontWeight: FontWeight.w600,
+          height: 1.2,
           color: _textDark,
+        ),
+        // Mono styles
+        labelSmall: TextStyle(
+          fontFamily: fontGeistMono,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: _secondaryTextDark,
         ),
       ),
+      // Additional text styles that aren't part of the standard textTheme
+      extensions: [
+        AppThemeExtension(
+          hintStyle: TextStyle(
+            fontFamily: fontGeist,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: _hintDark,
+            letterSpacing: -0.2,
+          ),
+          secondaryText: TextStyle(
+            fontFamily: fontGeist,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: _secondaryTextDark,
+          ),
+          monoText: TextStyle(
+            fontFamily: fontGeistMono,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: _secondaryTextDark,
+          ),
+        ),
+      ],
       iconTheme: const IconThemeData(
         color: _primaryDark,
         size: 24,
@@ -187,6 +283,47 @@ class AppTheme {
           ),
         ),
       ),
+    );
+  }
+}
+
+// Extension to add custom text styles to ThemeData
+class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
+  final TextStyle hintStyle;
+  final TextStyle secondaryText;
+  final TextStyle monoText;
+
+  AppThemeExtension({
+    required this.hintStyle,
+    required this.secondaryText,
+    required this.monoText,
+  });
+
+  @override
+  ThemeExtension<AppThemeExtension> copyWith({
+    TextStyle? hintStyle,
+    TextStyle? secondaryText,
+    TextStyle? monoText,
+  }) {
+    return AppThemeExtension(
+      hintStyle: hintStyle ?? this.hintStyle,
+      secondaryText: secondaryText ?? this.secondaryText,
+      monoText: monoText ?? this.monoText,
+    );
+  }
+
+  @override
+  ThemeExtension<AppThemeExtension> lerp(
+    covariant ThemeExtension<AppThemeExtension>? other,
+    double t,
+  ) {
+    if (other is! AppThemeExtension) {
+      return this;
+    }
+    return AppThemeExtension(
+      hintStyle: TextStyle.lerp(hintStyle, other.hintStyle, t)!,
+      secondaryText: TextStyle.lerp(secondaryText, other.secondaryText, t)!,
+      monoText: TextStyle.lerp(monoText, other.monoText, t)!,
     );
   }
 }

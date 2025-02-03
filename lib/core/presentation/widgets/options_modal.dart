@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart'
+    show CupertinoRadii;
+import 'custom_text_field.dart';
+import '../../theme/app_theme.dart';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 class OptionsModal extends StatelessWidget {
   final String title;
@@ -31,11 +36,11 @@ class OptionsModal extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[900]
                 : Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            shape: SquircleBorder(radius: BorderRadius.circular(32)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -44,62 +49,22 @@ class OptionsModal extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  fontFamily: 'Geist',
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               if (inputController != null) ...[
                 const SizedBox(height: 24),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      if (inputIcon != null) ...[
-                        inputIcon!,
-                        const SizedBox(width: 12),
-                      ],
-                      Expanded(
-                        child: TextField(
-                          controller: inputController,
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                            fontSize: 16,
-                            fontFamily: 'Geist',
-                          ),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            hintText: inputHint,
-                            hintStyle: TextStyle(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white38
-                                  : Colors.grey[400],
-                              fontSize: 16,
-                              fontFamily: 'Geist',
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                CustomTextField(
+                  controller: inputController,
+                  hintText: inputHint,
+                  backgroundColor:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[100],
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  hintStyle: Theme.of(context)
+                      .extension<AppThemeExtension>()
+                      ?.hintStyle,
+                  prefixIcon: inputIcon,
                 ),
               ],
               if (horizontalOptions.isNotEmpty) ...[
@@ -135,26 +100,23 @@ class OptionsModal extends StatelessWidget {
     return Builder(
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        final shape = SquircleBorder(radius: BorderRadius.circular(24));
         return Container(
           width: double.infinity,
           height: 56,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: isDark ? Colors.grey[800] : Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
+            shape: shape,
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: option.onTap,
-              borderRadius: BorderRadius.circular(12),
+              customBorder: shape,
               child: Center(
                 child: Text(
                   option.label,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontSize: 16,
-                    fontFamily: 'Geist',
-                  ),
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
             ),
@@ -168,13 +130,15 @@ class OptionsModal extends StatelessWidget {
     return Builder(
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textStyle = Theme.of(context).textTheme.labelMedium;
+        final shape = SquircleBorder(radius: BorderRadius.circular(32));
         return Container(
           width: 100,
           height: 100,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: isDark ? Colors.grey[800] : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
+            shape: shape,
+            shadows: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
@@ -185,7 +149,7 @@ class OptionsModal extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              customBorder: shape,
               onTap: option.onTap,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -197,14 +161,9 @@ class OptionsModal extends StatelessWidget {
                   Text(
                     option.label,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: option.isDestructive
-                          ? Colors.red[300]
-                          : (isDark ? Colors.white : Colors.grey[900]),
-                      fontSize: 14,
-                      height: 1.2,
-                      fontFamily: 'Geist',
-                    ),
+                    style: option.isDestructive
+                        ? textStyle?.copyWith(color: Colors.red[300])
+                        : textStyle,
                   ),
                 ],
               ),

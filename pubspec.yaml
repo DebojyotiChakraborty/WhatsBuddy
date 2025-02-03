@@ -51,6 +51,7 @@ dependencies:
   springster: ^0.4.0
   dismissible_page: ^1.0.2
   flutter_svg: ^2.0.10+1
+  cupertino_rounded_corners: ^2.1.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
