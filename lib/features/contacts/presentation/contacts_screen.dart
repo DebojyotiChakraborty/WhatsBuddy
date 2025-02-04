@@ -91,26 +91,53 @@ class ContactsScreen extends ConsumerWidget {
                                     contact.createdAt.toString()),
                                 direction: DismissDirection.endToStart,
                                 confirmDismiss: (direction) async {
-                                  return await showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Delete Contact?'),
-                                      content: const Text(
-                                          'This will remove the temporary contact'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context, false),
-                                          child: const Text('Cancel'),
+                                  return await showModalBottomSheet<bool>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (context) => OptionsModal(
+                                          title:
+                                              'Delete Contact?\nThis will remove the temporary contact',
+                                          options: [
+                                            OptionItem(
+                                              icon: SvgPicture.asset(
+                                                'assets/icons/delete_2_line.svg',
+                                                width: 24,
+                                                height: 24,
+                                                colorFilter: ColorFilter.mode(
+                                                  Colors.red[300]!,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                              label: 'Delete',
+                                              onTap: () {
+                                                Navigator.pop(context, true);
+                                              },
+                                              isDestructive: true,
+                                            ),
+                                            OptionItem(
+                                              icon: SvgPicture.asset(
+                                                'assets/icons/forbid_circle_line.svg',
+                                                width: 24,
+                                                height: 24,
+                                                colorFilter: ColorFilter.mode(
+                                                  Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark
+                                                      ? Colors.white
+                                                      : Colors.grey[900]!,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                              label: 'Cancel',
+                                              onTap: () {
+                                                Navigator.pop(context, false);
+                                              },
+                                            ),
+                                          ],
                                         ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context, true),
-                                          child: const Text('Delete'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                                      ) ??
+                                      false;
                                 },
                                 background: Container(
                                   decoration: BoxDecoration(

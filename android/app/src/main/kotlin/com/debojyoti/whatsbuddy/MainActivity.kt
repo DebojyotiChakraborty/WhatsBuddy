@@ -20,6 +20,7 @@ import io.flutter.plugin.common.MethodCall
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "com.debojyoti.whatsbuddy/status_files"
     private val REQUEST_CODE_OPEN_DIRECTORY = 1001
+    private var pendingAccessResult: MethodChannel.Result? = null
 
     private fun getStatusFolderUri(): Uri? {
         val statusPath = Environment.getExternalStorageDirectory().path +
@@ -43,19 +44,15 @@ class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call: MethodCall, result ->
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call: MethodCall, result: MethodChannel.Result ->
             when (call.method) {
                 "requestStatusFolderAccess" -> {
-                    val statusUri = getStatusFolderUri()
+                    pendingAccessResult = result
                     val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                        if (statusUri != null) {
-                            putExtra(DocumentsContract.EXTRA_INITIAL_URI, statusUri)
-                        }
                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                 Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
                     }
-                    startActivityForResult(intent, REQUEST_CODE_OPEN_DIRECTORY)
-                    result.success(null)
+                    startActivityForResult(intent, 1234)
                 }
                 "getStatusFiles" -> {
                     val uri = call.argument<String>("uri") ?: run {
@@ -148,17 +145,19 @@ class MainActivity: FlutterActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_OPEN_DIRECTORY && resultCode == Activity.RESULT_OK) {
-            data?.data?.let { uri ->
-                contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-                flutterEngine?.let {
-                    MethodChannel(it.dartExecutor.binaryMessenger, CHANNEL)
-                        .invokeMethod("onDirectorySelected", uri.toString())
+        if (requestCode == 1234) {
+            if (resultCode == Activity.RESULT_OK) {
+                data?.data?.let { uri ->
+                    contentResolver.takePersistableUriPermission(
+                        uri, 
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                    pendingAccessResult?.success(uri.toString())
                 }
+            } else {
+                pendingAccessResult?.error("ACCESS_DENIED", "User denied access", null)
             }
+            pendingAccessResult = null
         }
     }
 

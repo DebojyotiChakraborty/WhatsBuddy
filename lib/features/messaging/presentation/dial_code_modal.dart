@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 import '../data/country_model.dart';
 import '../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../core/theme/app_theme.dart';
@@ -57,9 +58,11 @@ class _DialCodeModalState extends State<DialCodeModal> {
       child: Container(
         margin: EdgeInsets.fromLTRB(16, 0, 16, keyboardHeight + 16),
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: isDark ? Colors.grey[900] : Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          shape: SquircleBorder(
+            radius: BorderRadius.circular(24),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
