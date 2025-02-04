@@ -45,8 +45,8 @@ class _FullScreenViewerState extends State<FullScreenViewer>
   void _setupAnimations() {
     _buttonAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
-      reverseDuration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 500),
+      reverseDuration: const Duration(milliseconds: 300),
     );
 
     if (!widget.isVideo) {
@@ -191,11 +191,12 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                   builder: (context, value, child) {
                     return BackdropFilter(
                       filter: ImageFilter.blur(
-                        sigmaX: blurSigma * value,
-                        sigmaY: blurSigma * value,
+                        sigmaX: blurSigma * value * (1 - actualProgress),
+                        sigmaY: blurSigma * value * (1 - actualProgress),
                       ),
                       child: Container(
-                        color: Colors.black.withOpacity(0.6 * opacity * value),
+                        color: Colors.black.withOpacity(
+                            0.6 * opacity * value * (1 - actualProgress)),
                       ),
                     );
                   },
@@ -238,36 +239,33 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                         animation: _buttonAnimationController,
                         builder: (context, child) {
                           final value = _buttonAnimationController.value;
-                          final yOffset = (1 - value) * 120;
-                          final scale = 0.8 + (value * 0.2);
-                          final buttonOpacity = value.clamp(0.0, 1.0);
+                          final yOffset = (1 - value) * 80;
+                          final opacity =
+                              value.clamp(0.0, 1.0) * (1 - actualProgress);
 
                           return Positioned(
-                            bottom: 40,
+                            bottom: 40 + (actualProgress * 120),
                             left: 0,
                             right: 0,
                             child: Transform.translate(
                               offset: Offset(0, yOffset),
-                              child: Transform.scale(
-                                scale: scale,
-                                child: Opacity(
-                                  opacity: buttonOpacity,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ActionButton(
-                                        icon: Icons.file_download_outlined,
-                                        label: 'Save file',
-                                        onPressed: _saveToDownloads,
-                                      ),
-                                      const SizedBox(width: 16),
-                                      ActionButton(
-                                        icon: Icons.share_outlined,
-                                        label: 'Share',
-                                        onPressed: _shareFile,
-                                      ),
-                                    ],
-                                  ),
+                              child: Opacity(
+                                opacity: opacity,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ActionButton(
+                                      icon: Icons.file_download_outlined,
+                                      label: 'Save file',
+                                      onPressed: _saveToDownloads,
+                                    ),
+                                    const SizedBox(width: 16),
+                                    ActionButton(
+                                      icon: Icons.share_outlined,
+                                      label: 'Share',
+                                      onPressed: _shareFile,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
