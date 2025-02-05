@@ -47,20 +47,20 @@ class AppTheme {
         titleLarge: const TextStyle(
           fontFamily: fontGeist,
           fontSize: 24,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
           height: 1.1,
           letterSpacing: -0.5,
           color: _textLight,
         ),
         // Body styles
         bodyLarge: const TextStyle(
-          fontFamily: fontGeist,
+          fontFamily: fontGeistMono,
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: _textLight,
         ),
         bodyMedium: const TextStyle(
-          fontFamily: fontGeist,
+          fontFamily: fontGeistMono,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: _textLight,
@@ -91,17 +91,18 @@ class AppTheme {
       extensions: [
         AppThemeExtension(
           hintStyle: TextStyle(
-            fontFamily: fontGeist,
+            fontFamily: fontGeistMono,
             fontSize: 16,
             fontWeight: FontWeight.w400,
             color: _hintLight,
             letterSpacing: -0.2,
           ),
           secondaryText: TextStyle(
-            fontFamily: fontGeist,
+            fontFamily: fontGeistMono,
             fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w400,
             color: _secondaryTextLight,
+            height: 1.2,
           ),
           monoText: TextStyle(
             fontFamily: fontGeistMono,
@@ -186,13 +187,13 @@ class AppTheme {
         ),
         // Body styles
         bodyLarge: const TextStyle(
-          fontFamily: fontGeist,
+          fontFamily: fontGeistMono,
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: _textDark,
         ),
         bodyMedium: const TextStyle(
-          fontFamily: fontGeist,
+          fontFamily: fontGeistMono,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: _textDark,
@@ -223,17 +224,18 @@ class AppTheme {
       extensions: [
         AppThemeExtension(
           hintStyle: TextStyle(
-            fontFamily: fontGeist,
+            fontFamily: fontGeistMono,
             fontSize: 16,
             fontWeight: FontWeight.w400,
             color: _hintDark,
             letterSpacing: -0.2,
           ),
           secondaryText: TextStyle(
-            fontFamily: fontGeist,
+            fontFamily: fontGeistMono,
             fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w400,
             color: _secondaryTextDark,
+            height: 1.2,
           ),
           monoText: TextStyle(
             fontFamily: fontGeistMono,

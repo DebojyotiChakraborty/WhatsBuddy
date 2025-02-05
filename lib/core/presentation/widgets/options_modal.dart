@@ -38,7 +38,7 @@ class OptionsModal extends StatelessWidget {
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[900]
                 : Colors.white,
-            shape: SquircleBorder(radius: BorderRadius.circular(32)),
+            shape: SquircleBorder(radius: BorderRadius.circular(44)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

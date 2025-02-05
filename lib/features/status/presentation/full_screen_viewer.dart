@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:heroine/heroine.dart';
 import '../../../core/presentation/widgets/action_button.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class FullScreenViewer extends StatefulWidget {
   final String uri;
@@ -255,13 +256,35 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     ActionButton(
-                                      icon: Icons.file_download_outlined,
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/file_download_line.svg',
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(
+                                          Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : Colors.grey[800]!,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
                                       label: 'Save file',
                                       onPressed: _saveToDownloads,
                                     ),
                                     const SizedBox(width: 16),
                                     ActionButton(
-                                      icon: Icons.share_outlined,
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/share_forward_line.svg',
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(
+                                          Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : Colors.grey[800]!,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
                                       label: 'Share',
                                       onPressed: _shareFile,
                                     ),

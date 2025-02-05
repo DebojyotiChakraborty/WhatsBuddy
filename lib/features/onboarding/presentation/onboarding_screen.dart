@@ -78,7 +78,7 @@ class OnboardingScreen extends StatelessWidget {
           description:
               'A thoughtfully designed and optimized UI that makes navigating through the app a delightful experience.',
           image: SvgPicture.asset(
-            'assets/icons/check_circle_line.svg',
+            'assets/icons/check_circle_fill.svg',
             height: 120,
             width: 120,
             colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),

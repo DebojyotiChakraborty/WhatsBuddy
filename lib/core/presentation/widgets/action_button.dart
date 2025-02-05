@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 class ActionButton extends StatelessWidget {
-  final IconData? icon;
+  final Widget icon;
   final String label;
   final VoidCallback onPressed;
   final bool isHorizontal;
@@ -10,7 +10,7 @@ class ActionButton extends StatelessWidget {
 
   const ActionButton({
     super.key,
-    this.icon,
+    required this.icon,
     required this.label,
     required this.onPressed,
     this.isHorizontal = false,
@@ -71,15 +71,8 @@ class ActionButton extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  color: isDestructive
-                      ? Colors.red[300]
-                      : (isDark ? Colors.white : Colors.grey[900]),
-                ),
-                const SizedBox(height: 8),
-              ],
+              icon,
+              const SizedBox(height: 8),
               Text(
                 label,
                 textAlign: TextAlign.center,

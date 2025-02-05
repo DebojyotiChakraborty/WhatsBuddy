@@ -48,6 +48,12 @@ class _BottomNavBarState extends ConsumerState<BottomNavBar> {
       label: 'Status',
       selectedColor: null,
     ),
+    const BottomNavItem(
+      icon: 'settings_3_line',
+      activeIcon: 'settings_3_fill',
+      label: 'Settings',
+      selectedColor: null,
+    ),
   ];
 
   @override
@@ -133,6 +139,8 @@ class _BottomNavBarState extends ConsumerState<BottomNavBar> {
   /// Builds the row of navigation items
   Widget _buildNavigationItems(int currentIndex, ThemeData theme) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: _items.asMap().entries.map((entry) {
         return BottomNavItemButton(
           item: entry.value.copyWith(

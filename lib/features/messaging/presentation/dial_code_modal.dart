@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
+import 'package:flutter_svg/svg.dart';
 import '../data/country_model.dart';
 import '../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../core/theme/app_theme.dart';
@@ -61,7 +62,7 @@ class _DialCodeModalState extends State<DialCodeModal> {
         decoration: ShapeDecoration(
           color: isDark ? Colors.grey[900] : Colors.white,
           shape: SquircleBorder(
-            radius: BorderRadius.circular(24),
+            radius: BorderRadius.circular(44),
           ),
         ),
         child: Column(
@@ -75,18 +76,21 @@ class _DialCodeModalState extends State<DialCodeModal> {
             ),
             const SizedBox(height: 24),
             CustomTextField(
-              controller: _searchController,
-              hintText: 'Search...',
-              backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
-              style: Theme.of(context).textTheme.bodyLarge,
-              hintStyle:
-                  Theme.of(context).extension<AppThemeExtension>()?.hintStyle,
-              prefixIcon: Icon(
-                Icons.search,
-                size: 20,
-                color: isDark ? Colors.white54 : Colors.grey[600],
-              ),
-            ),
+                controller: _searchController,
+                hintText: 'Search...',
+                backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
+                style: Theme.of(context).textTheme.bodyLarge,
+                hintStyle:
+                    Theme.of(context).extension<AppThemeExtension>()?.hintStyle,
+                prefixIcon: SvgPicture.asset(
+                  'assets/icons/search_line.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    isDark ? Colors.white70 : Colors.grey[600]!,
+                    BlendMode.srcIn,
+                  ),
+                )),
             const SizedBox(height: 24),
             ConstrainedBox(
               constraints: BoxConstraints(

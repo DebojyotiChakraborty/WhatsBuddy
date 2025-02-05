@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whatsbuddy/core/theme/app_theme.dart';
+import 'package:whatsbuddy/core/providers/theme_provider.dart';
 import 'package:whatsbuddy/features/contacts/data/contact_model.dart';
 import 'package:whatsbuddy/features/messaging/data/message_history_model.dart';
 import 'package:heroine/heroine.dart';
 import 'package:whatsbuddy/core/presentation/page_transition.dart';
 import 'package:whatsbuddy/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:whatsbuddy/features/preferences/presentation/preferences_screen.dart';
 
 import 'core/presentation/bottom_nav.dart';
 import 'features/contacts/presentation/contacts_screen.dart';
@@ -27,7 +29,7 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   Future<bool> _checkFirstLaunch() async {
@@ -36,12 +38,15 @@ class MyApp extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeNotifierProvider);
+
     return MaterialApp(
       title: 'WhatsBuddy',
       navigatorObservers: [HeroineController()],
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         physics: const BouncingScrollPhysics(),
         scrollbars: false,
@@ -87,6 +92,7 @@ class HomeNavigator extends ConsumerWidget {
       const MessagingScreen(),
       const ContactsScreen(),
       const StatusScreen(),
+      const PreferencesScreen(),
     ];
 
     return Scaffold(

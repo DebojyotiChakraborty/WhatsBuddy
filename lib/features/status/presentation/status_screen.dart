@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
+import '../../../core/theme/app_theme.dart';
 import '../data/status_repository.dart';
 import './full_screen_viewer.dart';
 import 'package:flutter/services.dart';
@@ -103,23 +104,18 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                   children: [
                     Text(
                       'Status Saver',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.black,
-                        fontFamily: 'Geist',
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Easily save any WhatsApp\nStatus to your local storage',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDark ? Colors.white54 : Colors.grey[600],
-                        height: 1.4,
-                        fontFamily: 'Geist',
-                      ),
+                      style: Theme.of(context)
+                          .extension<AppThemeExtension>()
+                          ?.secondaryText
+                          .copyWith(
+                            height: 1.4,
+                          ),
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -165,13 +161,13 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                           return Column(
                             children: [
                               Container(
-                                height: 40,
+                                height: 48,
                                 padding: const EdgeInsets.all(4),
                                 margin:
-                                    const EdgeInsets.symmetric(horizontal: 48),
+                                    const EdgeInsets.symmetric(horizontal: 80),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.grey[900]
+                                      ? Colors.grey[800]
                                       : Colors.grey[100],
                                   borderRadius: BorderRadius.circular(24),
                                 ),
@@ -179,7 +175,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                                   controller: _tabController,
                                   indicator: BoxDecoration(
                                     color: isDark
-                                        ? Colors.grey[800]
+                                        ? Colors.grey[900]
                                         : Colors.white,
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
@@ -197,6 +193,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                                   unselectedLabelColor: isDark
                                       ? Colors.white38
                                       : Colors.grey[400],
+                                  overlayColor: MaterialStateProperty.all(
+                                      Colors.transparent),
                                   labelStyle: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,

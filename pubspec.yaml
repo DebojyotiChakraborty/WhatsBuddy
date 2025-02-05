@@ -54,6 +54,8 @@ dependencies:
   cupertino_rounded_corners: ^2.1.1
   shimmer: ^3.0.0
   cupertino_onboarding: ^1.3.0
+  flutter_launcher_icons: ^0.14.3
+  pull_down_button: ^0.10.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -72,6 +74,15 @@ dev_dependencies:
   flutter_lints: ^2.0.3
   hive_generator: ^1.1.3
   build_runner: ^2.4.6
+  
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/app_icon/icon.png"
+  adaptive_icon_background: "assets/app_icon/adaptive_background.png"
+  adaptive_icon_foreground: "assets/app_icon/adaptive_foreground.png"
+  monochrome: "assets/app_icon/monochrome.png"
+  ios : false
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -117,14 +128,23 @@ flutter:
   
   # Add these assets
   assets:
+    - assets/icons/brightness_line.svg
+    - assets/icons/brush_3_line.svg
     - assets/icons/chat_3_fill.svg
     - assets/icons/chat_3_line.svg
     - assets/icons/check_circle_line.svg
+    - assets/icons/check_circle_fill.svg
     - assets/icons/contacts_2_line.svg
     - assets/icons/delete_2_line.svg
+    - assets/icons/directory_line.svg
+    - assets/icons/drink_line.svg
     - assets/icons/file_download_line.svg
     - assets/icons/forbid_circle_line.svg
+    - assets/icons/github_line.svg
     - assets/icons/history_line.svg
+    - assets/icons/information_line.svg
+    - assets/icons/moon_line.svg
+    - assets/icons/phone_add_line.svg
     - assets/icons/phone_call_line.svg
     - assets/icons/pic_fill.svg
     - assets/icons/pic_line.svg
@@ -132,11 +152,17 @@ flutter:
     - assets/icons/sandglass_fill.svg
     - assets/icons/sandglass_line.svg
     - assets/icons/search_line.svg
+    - assets/icons/selector_vertical_line.svg
+    - assets/icons/settings_3_fill.svg
+    - assets/icons/settings_3_line.svg
     - assets/icons/share_forward_line.svg
+    - assets/icons/sun_line.svg
+    - assets/icons/sun-moon.svg
     - assets/icons/user_add_2_line.svg
     - assets/icons/whatsapp_fill.svg
     - assets/icons/whatsapp_line.svg
     - assets/data/country_dial_code.json
+    - assets/images/dev_avatar.jpg
 
   
 

@@ -6,6 +6,7 @@ import 'package:intl_phone_field/phone_number.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/presentation/widgets/options_modal.dart';
@@ -161,31 +162,33 @@ class ContactsScreen extends ConsumerWidget {
                                 },
                                 child: Container(
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(
+                                      horizontal: 16, vertical: 4),
+                                  decoration: ShapeDecoration(
                                     color: isDark
                                         ? Colors.grey[800]
                                         : Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
+                                    shape: SquircleBorder(
+                                        radius: BorderRadius.circular(24)),
                                   ),
                                   child: Material(
                                     color: Colors.transparent,
                                     child: InkWell(
                                       onTap: () => _showContactOptions(
                                           context, contact, index),
-                                      borderRadius: BorderRadius.circular(8),
+                                      customBorder: SquircleBorder(
+                                          radius: BorderRadius.circular(24)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(16),
                                         child: Row(
                                           children: [
                                             SvgPicture.asset(
-                                              'assets/icons/user_add_2_line.svg',
+                                              'assets/icons/contacts_2_line.svg',
                                               width: 20,
                                               height: 20,
                                               colorFilter: ColorFilter.mode(
                                                 isDark
-                                                    ? Colors.white70
-                                                    : Colors.grey[600]!,
+                                                    ? Colors.white
+                                                    : Colors.black,
                                                 BlendMode.srcIn,
                                               ),
                                             ),
@@ -204,18 +207,39 @@ class ContactsScreen extends ConsumerWidget {
                                                       color: isDark
                                                           ? Colors.white
                                                           : Colors.black,
-                                                      fontFamily: 'Geist',
+                                                      fontFamily: 'GeistMono',
                                                     ),
                                                   ),
                                                   const SizedBox(height: 4),
-                                                  Text(
-                                                    contact.number,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: isDark
-                                                          ? Colors.white54
-                                                          : Colors.grey[600],
-                                                      fontFamily: 'GeistMono',
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: contact.number
+                                                              .split(' ')[0],
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: isDark
+                                                                ? Colors.white54
+                                                                : Colors
+                                                                    .grey[600],
+                                                            fontFamily:
+                                                                'GeistMono',
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              ' ${contact.number.split(' ')[1]}',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: isDark
+                                                                ? Colors.white
+                                                                : Colors.black,
+                                                            fontFamily:
+                                                                'GeistMono',
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ],
@@ -229,7 +253,7 @@ class ContactsScreen extends ConsumerWidget {
                                                 color: isDark
                                                     ? Colors.white54
                                                     : Colors.grey[600],
-                                                fontFamily: 'Geist',
+                                                fontFamily: 'GeistMono',
                                               ),
                                             ),
                                           ],
@@ -360,22 +384,6 @@ class ContactsScreen extends ConsumerWidget {
           ),
           OptionItem(
             icon: SvgPicture.asset(
-              'assets/icons/whatsapp_line.svg',
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                isDark ? Colors.white : Colors.grey[900]!,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: 'Start Chat',
-            onTap: () {
-              Navigator.pop(context);
-              _openWhatsAppChat(context, contact.number);
-            },
-          ),
-          OptionItem(
-            icon: SvgPicture.asset(
               'assets/icons/delete_2_line.svg',
               width: 24,
               height: 24,
@@ -392,6 +400,22 @@ class ContactsScreen extends ConsumerWidget {
               Navigator.pop(context);
             },
             isDestructive: true,
+          ),
+          OptionItem(
+            icon: SvgPicture.asset(
+              'assets/icons/whatsapp_line.svg',
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                isDark ? Colors.white : Colors.grey[900]!,
+                BlendMode.srcIn,
+              ),
+            ),
+            label: 'Start Chat',
+            onTap: () {
+              Navigator.pop(context);
+              _openWhatsAppChat(context, contact.number);
+            },
           ),
         ],
       ),

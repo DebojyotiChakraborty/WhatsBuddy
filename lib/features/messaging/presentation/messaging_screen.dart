@@ -89,13 +89,14 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
     }
 
     final cleanNumber = '${_selectedCountry!.dialCode}$phoneNumber';
+    final displayNumber = '${_selectedCountry!.dialCode} $phoneNumber';
     final url = Uri.parse('${AppConstants.whatsappUrlScheme}$cleanNumber');
 
     try {
       if (!await launchUrl(url)) {
         throw Exception('Could not launch WhatsApp');
       }
-      await MessagingRepository.addToHistory(cleanNumber);
+      await MessagingRepository.addToHistory(displayNumber);
       setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,7 +131,8 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
 
     final nameController = TextEditingController();
     final phoneNumber =
-        '${_selectedCountry!.dialCode}${_phoneController.text.trim()}';
+        '${_selectedCountry!.dialCode} ${_phoneController.text.trim()}';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
@@ -140,30 +142,38 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
         title: 'Save\nTemporary Contact',
         inputController: nameController,
         inputHint: 'Enter contact name...',
-        inputIcon: Icon(
-          Icons.person_outline,
-          size: 20,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white54
-              : Colors.grey[600],
+        inputIcon: SvgPicture.asset(
+          'assets/icons/user_add_2_line.svg',
+          width: 20,
+          height: 20,
+          colorFilter: ColorFilter.mode(
+            Colors.green[400]!,
+            BlendMode.srcIn,
+          ),
         ),
         options: [
           OptionItem(
-            icon: Icon(
-              Icons.close,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.grey[900],
+            icon: SvgPicture.asset(
+              'assets/icons/forbid_circle_line.svg',
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                isDark ? Colors.white : Colors.grey[800]!,
+                BlendMode.srcIn,
+              ),
             ),
             label: 'Cancel',
             onTap: () => Navigator.pop(context),
           ),
           OptionItem(
-            icon: Icon(
-              Icons.check,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.grey[900],
+            icon: SvgPicture.asset(
+              'assets/icons/check_circle_line.svg',
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                isDark ? Colors.white : Colors.grey[800]!,
+                BlendMode.srcIn,
+              ),
             ),
             label: 'Save',
             onTap: () {
@@ -192,7 +202,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 60),
               // App Icon
               SvgPicture.asset(
                 'assets/icons/whatsapp_line.svg',
@@ -203,7 +213,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   BlendMode.srcIn,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 60),
               // Country Code Selector
               GestureDetector(
                 onTap: _showCountrySelector,
@@ -233,7 +243,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             color: isDark ? Colors.white : Colors.grey[800],
-                            fontFamily: 'Geist',
+                            fontFamily: 'GeistMono',
                           ),
                         )
                       else
@@ -242,14 +252,14 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             color: isDark ? Colors.white54 : Colors.grey[400],
-                            fontFamily: 'Geist',
+                            fontFamily: 'GeistMono',
                           ),
                         ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 40),
               // Phone Input
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -264,7 +274,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   hintText: 'Enter phone number...',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.white54 : Colors.grey[400],
-                    fontFamily: 'Geist',
+                    fontFamily: 'GeistMono',
                   ),
                   prefixIcon: SvgPicture.asset(
                     'assets/icons/phone_call_line.svg',
@@ -277,25 +287,41 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 80),
               // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ActionButton(
-                    icon: Icons.schedule,
+                    icon: SvgPicture.asset(
+                      'assets/icons/whatsapp_line.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? Colors.white : Colors.grey[800]!,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     label: 'Start Chat',
                     onPressed: _openWhatsAppChat,
                   ),
                   const SizedBox(width: 16),
                   ActionButton(
-                    icon: Icons.save_outlined,
+                    icon: SvgPicture.asset(
+                      'assets/icons/phone_add_line.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? Colors.white : Colors.grey[800]!,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     label: 'Save\nTemporarily',
                     onPressed: () => _showSaveContactModal(context),
                   ),
                 ],
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 60),
               _buildHistorySection(context),
             ],
           ),
@@ -320,8 +346,8 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
               children: [
                 SvgPicture.asset(
                   'assets/icons/history_line.svg',
-                  width: 20,
-                  height: 20,
+                  width: 26,
+                  height: 26,
                   colorFilter: ColorFilter.mode(
                     isDark ? Colors.white : Colors.grey[900]!,
                     BlendMode.srcIn,
@@ -330,12 +356,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                 const SizedBox(width: 8),
                 Text(
                   'History',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : Colors.grey[900],
-                    fontFamily: 'Geist',
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
               ],
             ),
@@ -348,7 +369,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                 final history = snapshot.data![index];
                 return Container(
                   margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: ShapeDecoration(
                     color: isDark ? Colors.grey[800] : Colors.white,
                     shape: SquircleBorder(radius: BorderRadius.circular(24)),
@@ -368,7 +389,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                               width: 20,
                               height: 20,
                               colorFilter: ColorFilter.mode(
-                                isDark ? Colors.white70 : Colors.grey[600]!,
+                                isDark ? Colors.white : Colors.black,
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -377,14 +398,34 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    history.phoneNumber,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color:
-                                          isDark ? Colors.white : Colors.black,
-                                      fontFamily: 'GeistMono',
+                                  RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text:
+                                              history.phoneNumber.split(' ')[0],
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: isDark
+                                                ? Colors.white54
+                                                : Colors.grey[600],
+                                            fontFamily: 'GeistMono',
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              ' ${history.phoneNumber.split(' ')[1]}',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black,
+                                            fontFamily: 'GeistMono',
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -395,7 +436,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                                       color: isDark
                                           ? Colors.white54
                                           : Colors.grey[500],
-                                      fontFamily: 'Geist',
+                                      fontFamily: 'GeistMono',
                                     ),
                                   ),
                                 ],
@@ -403,7 +444,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                             ),
                             Icon(
                               Icons.chevron_right,
-                              color: isDark ? Colors.white54 : Colors.grey[400],
+                              color: isDark ? Colors.white : Colors.black,
                             ),
                           ],
                         ),
@@ -413,7 +454,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                 );
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Center(
               child: TextButton.icon(
                 onPressed: () async {
