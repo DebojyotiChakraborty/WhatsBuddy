@@ -33,7 +33,6 @@ class AppTheme {
         onSecondary: _surfaceLight,
         surface: _surfaceLight,
         onSurface: _textLight,
-        background: _backgroundLight,
       ),
       textTheme: TextTheme(
         // Display styles
@@ -167,7 +166,6 @@ class AppTheme {
         onSecondary: _surfaceDark,
         surface: _surfaceDark,
         onSurface: _textDark,
-        background: _backgroundDark,
       ),
       textTheme: TextTheme(
         // Display styles

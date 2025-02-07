@@ -9,6 +9,8 @@ import './full_screen_viewer.dart';
 import 'package:flutter/services.dart';
 import 'package:heroine/heroine.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../main.dart';
+import '../../../core/presentation/custom_route.dart';
 
 // Create a state notifier to handle the status files
 class StatusNotifier extends StateNotifier<AsyncValue<List<String>>> {
@@ -94,7 +96,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -399,42 +401,53 @@ class _MediaThumbnail extends StatelessWidget {
             ),
           ],
         ),
-        child: Heroine(
-          tag: uri,
-          spring: Spring.bouncy,
-          flightShuttleBuilder: const FlipShuttleBuilder(),
-          child: ClipPath(
-            clipper: ShapeBorderClipper(
-              shape: SquircleBorder(radius: BorderRadius.circular(32)),
+        child: ValueListenableBuilder<Spring>(
+          valueListenable: springNotifier,
+          builder: (context, spring, _) => ValueListenableBuilder<bool>(
+            valueListenable: adjustSpringTimingToRoute,
+            builder: (context, adjustToRoute, _) =>
+                ValueListenableBuilder<HeroineShuttleBuilder>(
+              valueListenable: flightShuttleNotifier,
+              builder: (context, shuttleBuilder, _) => Heroine(
+                tag: uri,
+                spring: spring,
+                adjustToRouteTransitionDuration: adjustToRoute,
+                flightShuttleBuilder: shuttleBuilder,
+                child: ClipPath(
+                  clipper: ShapeBorderClipper(
+                    shape: SquircleBorder(radius: BorderRadius.circular(32)),
+                  ),
+                  child: StatusRepository.isImage(uri)
+                      ? FutureBuilder<Uint8List>(
+                          future: _loadImageBytes(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                              return Image.memory(
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              );
+                            }
+                            return Container(
+                              color: Theme.of(context).colorScheme.surface,
+                              child: Center(
+                                child: Icon(
+                                  Icons.image,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.6),
+                                  size: 32,
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : _VideoPreview(uri: uri),
+                ),
+              ),
             ),
-            child: StatusRepository.isImage(uri)
-                ? FutureBuilder<Uint8List>(
-                    future: _loadImageBytes(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                        return Image.memory(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        );
-                      }
-                      return Container(
-                        color: Theme.of(context).colorScheme.surface,
-                        child: Center(
-                          child: Icon(
-                            Icons.image,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.6),
-                            size: 32,
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                : _VideoPreview(uri: uri),
           ),
         ),
       ),
@@ -444,15 +457,30 @@ class _MediaThumbnail extends StatelessWidget {
   void _openFullScreen(BuildContext context) {
     Navigator.push(
       context,
-      PageRouteBuilder(
-        opaque: false,
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            FullScreenViewer(
-          uri: uri,
-          isVideo: StatusRepository.isVideo(uri),
+      CustomRoute(
+        fullscreenDialog: true,
+        title: 'Status',
+        builder: (context) => ValueListenableBuilder<double>(
+          valueListenable: ModalRoute.of(context)?.secondaryAnimation ??
+              const AlwaysStoppedAnimation(0),
+          builder: (context, value, child) {
+            final easedValue = Curves.easeOut.transform(value);
+            return ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Theme.of(context)
+                    .colorScheme
+                    .surface
+                    .withOpacity(.5 * easedValue),
+                BlendMode.srcOver,
+              ),
+              child: child!,
+            );
+          },
+          child: FullScreenViewer(
+            uri: uri,
+            isVideo: StatusRepository.isVideo(uri),
+          ),
         ),
-        transitionDuration: const Duration(milliseconds: 500),
-        reverseTransitionDuration: const Duration(milliseconds: 500),
       ),
     );
   }

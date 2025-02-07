@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,7 +17,7 @@ class ContactsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: ValueListenableBuilder(
           valueListenable: Hive.box<Contact>('contacts').listenable(),
@@ -104,8 +102,8 @@ class ContactsScreen extends ConsumerWidget {
                                                 'assets/icons/delete_2_line.svg',
                                                 width: 24,
                                                 height: 24,
-                                                colorFilter: ColorFilter.mode(
-                                                  const Color(0xFFE57373),
+                                                colorFilter: const ColorFilter.mode(
+                                                  Color(0xFFE57373),
                                                   BlendMode.srcIn,
                                                 ),
                                               ),

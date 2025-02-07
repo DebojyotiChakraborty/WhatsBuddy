@@ -18,6 +18,11 @@ import 'features/messaging/presentation/messaging_screen.dart';
 import 'features/status/presentation/status_screen.dart';
 import 'features/status/data/status_repository.dart';
 
+final springNotifier = ValueNotifier(Spring.bouncy);
+final flightShuttleNotifier =
+    ValueNotifier<HeroineShuttleBuilder>(const FlipShuttleBuilder());
+final adjustSpringTimingToRoute = ValueNotifier(false);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();

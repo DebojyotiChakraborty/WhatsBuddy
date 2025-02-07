@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:heroine/heroine.dart';
 import '../../../core/presentation/widgets/action_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../main.dart';
 
 class FullScreenViewer extends StatefulWidget {
   final String uri;
@@ -219,16 +220,30 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                             child: DragDismissable(
                               child: KeyedSubtree(
                                 key: ValueKey(widget.uri),
-                                child: Heroine(
-                                  tag: widget.uri,
-                                  spring: _spring,
-                                  flightShuttleBuilder:
-                                      const FlipShuttleBuilder(),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.zero,
-                                    child: widget.isVideo
-                                        ? _buildVideoPlayer()
-                                        : _buildImage(),
+                                child: ValueListenableBuilder<Spring>(
+                                  valueListenable: springNotifier,
+                                  builder: (context, spring, _) =>
+                                      ValueListenableBuilder<bool>(
+                                    valueListenable: adjustSpringTimingToRoute,
+                                    builder: (context, adjustToRoute, _) =>
+                                        ValueListenableBuilder<
+                                            HeroineShuttleBuilder>(
+                                      valueListenable: flightShuttleNotifier,
+                                      builder: (context, shuttleBuilder, _) =>
+                                          Heroine(
+                                        tag: widget.uri,
+                                        spring: spring,
+                                        adjustToRouteTransitionDuration:
+                                            adjustToRoute,
+                                        flightShuttleBuilder: shuttleBuilder,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.zero,
+                                          child: widget.isVideo
+                                              ? _buildVideoPlayer()
+                                              : _buildImage(),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

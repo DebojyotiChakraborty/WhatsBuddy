@@ -17,7 +17,7 @@ class PreferencesScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeNotifierProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
