@@ -23,19 +23,13 @@ class MainActivity: FlutterActivity() {
     private var pendingAccessResult: MethodChannel.Result? = null
 
     private fun getStatusFolderUri(): Uri? {
-        val statusPath = Environment.getExternalStorageDirectory().path +
-            "/Android/media/com.whatsapp/WhatsApp/Media/.Statuses"
-        
         return try {
-            val file = File(statusPath)
-            if (file.exists()) {
-                DocumentsContract.buildDocumentUriUsingTree(
-                    Uri.parse("content://com.android.externalstorage.documents"),
-                    "tree:primary:Android%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia%2F.Statuses"
-                )
-            } else {
-                null
-            }
+            val whatsappPath = "Android%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia%2F.Statuses"
+            val authority = "com.android.externalstorage.documents"
+            val treeUri = "content://$authority/tree/primary:$whatsappPath"
+            val docId = "primary:$whatsappPath"
+            
+            DocumentsContract.buildTreeDocumentUri(authority, docId)
         } catch (e: Exception) {
             null
         }
@@ -48,11 +42,23 @@ class MainActivity: FlutterActivity() {
             when (call.method) {
                 "requestStatusFolderAccess" -> {
                     pendingAccessResult = result
+                    // Clear any previously persisted URI permissions
+                    for (permission in contentResolver.persistedUriPermissions) {
+                        contentResolver.releasePersistableUriPermission(
+                            permission.uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    }
+                    
+                    val statusUri = getStatusFolderUri()
                     val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                 Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                        if (statusUri != null) {
+                            putExtra(DocumentsContract.EXTRA_INITIAL_URI, statusUri)
+                        }
                     }
-                    startActivityForResult(intent, 1234)
+                    startActivityForResult(intent, REQUEST_CODE_OPEN_DIRECTORY)
                 }
                 "getStatusFiles" -> {
                     val uri = call.argument<String>("uri") ?: run {
@@ -145,14 +151,31 @@ class MainActivity: FlutterActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1234) {
+        if (requestCode == REQUEST_CODE_OPEN_DIRECTORY) {
             if (resultCode == Activity.RESULT_OK) {
                 data?.data?.let { uri ->
-                    contentResolver.takePersistableUriPermission(
-                        uri, 
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
-                    pendingAccessResult?.success(uri.toString())
+                    try {
+                        // Take persistable permission
+                        contentResolver.takePersistableUriPermission(
+                            uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                        
+                        // Verify if this is the WhatsApp status directory
+                        val docId = DocumentsContract.getTreeDocumentId(uri)
+                        if (docId.contains("Android/media/com.whatsapp/WhatsApp/Media/.Statuses", ignoreCase = true)) {
+                            pendingAccessResult?.success(uri.toString())
+                        } else {
+                            pendingAccessResult?.error(
+                                "INVALID_DIRECTORY",
+                                "Please select the WhatsApp status directory",
+                                null
+                            )
+                        }
+                    } catch (e: Exception) {
+                        pendingAccessResult?.error("ACCESS_ERROR", e.message, null)
+                    }
                 }
             } else {
                 pendingAccessResult?.error("ACCESS_DENIED", "User denied access", null)

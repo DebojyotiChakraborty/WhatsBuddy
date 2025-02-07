@@ -7,7 +7,7 @@ class AppTheme {
   // Light Theme Colors
   static const _primaryLight = Color.fromARGB(255, 0, 0, 0);
   static const _surfaceLight = Color(0xFFFFFFFF);
-  static const _backgroundLight = Color(0xFFF5F5F5);
+  static const _backgroundLight = Color(0xFFF6F6F6);
   static const _textLight = Color(0xFF1A1A1A);
   static const _secondaryLight = Color.fromARGB(255, 0, 0, 0);
   static final _hintLight = const Color(0xFF1A1A1A).withOpacity(0.35);
@@ -15,8 +15,8 @@ class AppTheme {
 
   // Dark Theme Colors
   static const _primaryDark = Color.fromARGB(255, 255, 255, 255);
-  static const _surfaceDark = Color(0xFF1A1A1A);
-  static const _backgroundDark = Color(0xFF000000);
+  static const _surfaceDark = Color(0xFF232323);
+  static const _backgroundDark = Color(0xFF171717);
   static const _textDark = Color(0xFFFFFFFF);
   static const _secondaryDark = Color.fromARGB(255, 255, 255, 255);
   static final _hintDark = const Color(0xFFFFFFFF).withOpacity(0.35);
@@ -33,6 +33,7 @@ class AppTheme {
         onSecondary: _surfaceLight,
         surface: _surfaceLight,
         onSurface: _textLight,
+        background: _backgroundLight,
       ),
       textTheme: TextTheme(
         // Display styles
@@ -166,6 +167,7 @@ class AppTheme {
         onSecondary: _surfaceDark,
         surface: _surfaceDark,
         onSurface: _textDark,
+        background: _backgroundDark,
       ),
       textTheme: TextTheme(
         // Display styles

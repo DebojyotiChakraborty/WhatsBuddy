@@ -6,6 +6,7 @@ import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 
 class OptionsModal extends StatelessWidget {
   final String title;
+  final String? message;
   final List<OptionItem> options;
   final TextEditingController? inputController;
   final String? inputHint;
@@ -14,6 +15,7 @@ class OptionsModal extends StatelessWidget {
   const OptionsModal({
     super.key,
     required this.title,
+    this.message,
     required this.options,
     this.inputController,
     this.inputHint,
@@ -49,6 +51,16 @@ class OptionsModal extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
+              if (message != null) ...[
+                const SizedBox(height: 16),
+                Text(
+                  message!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .extension<AppThemeExtension>()
+                      ?.secondaryText,
+                ),
+              ],
               if (inputController != null) ...[
                 const SizedBox(height: 24),
                 CustomTextField(

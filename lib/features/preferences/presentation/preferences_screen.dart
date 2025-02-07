@@ -14,11 +14,10 @@ class PreferencesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeNotifierProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -62,17 +61,17 @@ class PreferencesScreen extends ConsumerWidget {
                     context,
                     icon: 'assets/icons/drink_line.svg',
                     title: 'Donate or Support',
-                    subtitle: 'Buy me a coffee',
+                    subtitle: 'Support me on Kofi',
                     onTap: () =>
-                        _launchURL('https://www.buymeacoffee.com/yourusername'),
+                        _launchURL('https://ko-fi.com/stellar_studios'),
                   ),
                   _buildPreferenceCard(
                     context,
                     icon: 'assets/icons/github_line.svg',
                     title: 'Github Repository',
-                    subtitle: 'Checkout the code for yourself',
+                    subtitle: 'Review the codebase',
                     onTap: () => _launchURL(
-                        'https://github.com/yourusername/whatsbuddy'),
+                        'https://github.com/DebojyotiChakraborty/WhatsBuddy'),
                   ),
                   _buildPreferenceCard(
                     context,
@@ -89,7 +88,7 @@ class PreferencesScreen extends ConsumerWidget {
                   const SizedBox(height: 60),
                   Center(
                     child: GestureDetector(
-                      onTap: () => _launchURL('https://your-portfolio-url.com'),
+                      onTap: () => _launchURL('https://x.com/Pseudo_Maverick'),
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
@@ -141,7 +140,7 @@ class PreferencesScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: ShapeDecoration(
-        color: isDark ? Colors.grey[800] : Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         shape: SquircleBorder(radius: BorderRadius.circular(24)),
       ),
       child: Material(
@@ -207,17 +206,23 @@ class PreferencesScreen extends ConsumerWidget {
                         _getThemeModeText(currentTheme),
                         style: TextStyle(
                           fontSize: 16,
-                          color: isDark ? Colors.white54 : Colors.grey[600],
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.54),
                           fontFamily: 'GeistMono',
                         ),
                       ),
                       const SizedBox(width: 4),
                       SvgPicture.asset(
-                        'assets/icons/right_line.svg',
-                        width: 20,
-                        height: 20,
+                        'assets/icons/selector_vertical_line.svg',
+                        width: 28,
+                        height: 28,
                         colorFilter: ColorFilter.mode(
-                          isDark ? Colors.white54 : Colors.grey[600]!,
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.54),
                           BlendMode.srcIn,
                         ),
                       ),
@@ -244,7 +249,7 @@ class PreferencesScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: ShapeDecoration(
-        color: isDark ? Colors.grey[800] : Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         shape: SquircleBorder(radius: BorderRadius.circular(24)),
       ),
       child: Material(
@@ -276,7 +281,7 @@ class PreferencesScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? Colors.white : Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontFamily: 'GeistMono',
                         ),
                       ),
@@ -286,7 +291,10 @@ class PreferencesScreen extends ConsumerWidget {
                           subtitle,
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark ? Colors.white54 : Colors.grey[600],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.54),
                             fontFamily: 'GeistMono',
                           ),
                         ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cupertino_rounded_corners/cupertino_rounded_corners.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/presentation/widgets/options_modal.dart';
 import '../data/status_repository.dart';
 import './full_screen_viewer.dart';
 import 'package:flutter/services.dart';
@@ -93,7 +94,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -130,6 +131,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                     children: [
                       Text(
                         'Storage access is required for Status files',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
                           color: isDark ? Colors.white54 : Colors.grey[600],
@@ -167,16 +169,16 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                                     const EdgeInsets.symmetric(horizontal: 80),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.grey[800]
-                                      : Colors.grey[100],
+                                      ? Theme.of(context).colorScheme.surface
+                                      : Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(24),
                                 ),
                                 child: TabBar(
                                   controller: _tabController,
                                   indicator: BoxDecoration(
                                     color: isDark
-                                        ? Colors.grey[900]
-                                        : Colors.white,
+                                        ? const Color(0xFF151515)
+                                        : const Color(0xFFE8E8E8),
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
@@ -189,11 +191,14 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                                   dividerColor: Colors.transparent,
                                   indicatorSize: TabBarIndicatorSize.tab,
                                   labelColor:
-                                      isDark ? Colors.white : Colors.black,
+                                      Theme.of(context).colorScheme.onSurface,
                                   unselectedLabelColor: isDark
-                                      ? Colors.white38
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withOpacity(0.38)
                                       : Colors.grey[400],
-                                  overlayColor: MaterialStateProperty.all(
+                                  overlayColor: WidgetStateProperty.all(
                                       Colors.transparent),
                                   labelStyle: const TextStyle(
                                     fontSize: 15,
@@ -265,16 +270,40 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
   }
 
   void _requestAccess() async {
-    await StatusRepository.requestStatusAccess();
-    await Future.delayed(const Duration(milliseconds: 500));
-    final uri = await StatusRepository.getStatusFolderUri();
-    if (mounted && uri != null) {
-      setState(() => _selectedDirectory = uri);
-      ref.read(statusNotifierProvider.notifier).loadStatuses();
-      _loadFiles();
-    } else if (mounted) {
-      _checkExistingAccess();
-    }
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => OptionsModal(
+        title: 'Important',
+        message:
+            'On the next screen, make sure to select the location "Android/media/com.whatsapp/WhatsApp/Media/.Statuses". Once done, press the "Use this folder" button at the bottom to confirm. Selecting any other folder would not work.',
+        options: [
+          OptionItem(
+            label: 'OK',
+            onTap: () async {
+              Navigator.pop(context);
+              await StatusRepository.requestStatusAccess();
+              await Future.delayed(const Duration(milliseconds: 500));
+              final uri = await StatusRepository.getStatusFolderUri();
+              if (mounted && uri != null) {
+                setState(() => _selectedDirectory = uri);
+                ref.read(statusNotifierProvider.notifier).loadStatuses();
+                _loadFiles();
+              } else if (mounted) {
+                _checkExistingAccess();
+              }
+            },
+            isHorizontal: true,
+          ),
+          OptionItem(
+            label: 'Cancel',
+            onTap: () => Navigator.pop(context),
+            isHorizontal: true,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -357,7 +386,6 @@ class _MediaThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => _openFullScreen(context),
       child: Container(
@@ -392,11 +420,14 @@ class _MediaThumbnail extends StatelessWidget {
                         );
                       }
                       return Container(
-                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                        color: Theme.of(context).colorScheme.surface,
                         child: Center(
                           child: Icon(
                             Icons.image,
-                            color: isDark ? Colors.grey[600] : Colors.grey[400],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.6),
                             size: 32,
                           ),
                         ),

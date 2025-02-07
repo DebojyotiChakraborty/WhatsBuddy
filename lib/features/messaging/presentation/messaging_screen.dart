@@ -195,9 +195,8 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -205,7 +204,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
               const SizedBox(height: 60),
               // App Icon
               SvgPicture.asset(
-                'assets/icons/whatsapp_line.svg',
+                'assets/icons/whatsbuddy_icon.svg',
                 width: 32,
                 height: 32,
                 colorFilter: ColorFilter.mode(
@@ -222,7 +221,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: ShapeDecoration(
-                    color: isDark ? Colors.grey[800] : Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     shape: SquircleBorder(radius: BorderRadius.circular(24)),
                   ),
                   child: Row(
@@ -234,7 +233,10 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: isDark ? Colors.white70 : Colors.grey[600],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.7),
                           ),
                         )
                       else if (_selectedCountry != null)
@@ -242,7 +244,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                           '${_selectedCountry!.dialCode} (${_selectedCountry!.name})',
                           style: TextStyle(
                             fontSize: 16,
-                            color: isDark ? Colors.white : Colors.grey[800],
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontFamily: 'GeistMono',
                           ),
                         )
@@ -251,7 +253,10 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                           'Select Country',
                           style: TextStyle(
                             fontSize: 16,
-                            color: isDark ? Colors.white54 : Colors.grey[400],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.54),
                             fontFamily: 'GeistMono',
                           ),
                         ),
@@ -266,14 +271,17 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                 child: CustomTextField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  backgroundColor: isDark ? Colors.grey[800] : Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   style: TextStyle(
-                    color: isDark ? Colors.white : Colors.grey[800],
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontFamily: 'GeistMono',
                   ),
                   hintText: 'Enter phone number...',
                   hintStyle: TextStyle(
-                    color: isDark ? Colors.white54 : Colors.grey[400],
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.54),
                     fontFamily: 'GeistMono',
                   ),
                   prefixIcon: SvgPicture.asset(
@@ -281,7 +289,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                     width: 20,
                     height: 20,
                     colorFilter: ColorFilter.mode(
-                      isDark ? Colors.white70 : Colors.grey[600]!,
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -298,7 +306,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                       width: 24,
                       height: 24,
                       colorFilter: ColorFilter.mode(
-                        isDark ? Colors.white : Colors.grey[800]!,
+                        Theme.of(context).colorScheme.onSurface,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -312,7 +320,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                       width: 24,
                       height: 24,
                       colorFilter: ColorFilter.mode(
-                        isDark ? Colors.white : Colors.grey[800]!,
+                        Theme.of(context).colorScheme.onSurface,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -371,7 +379,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: ShapeDecoration(
-                    color: isDark ? Colors.grey[800] : Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     shape: SquircleBorder(radius: BorderRadius.circular(24)),
                   ),
                   child: Material(

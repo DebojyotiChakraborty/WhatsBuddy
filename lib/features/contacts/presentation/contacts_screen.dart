@@ -18,9 +18,8 @@ class ContactsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: ValueListenableBuilder(
           valueListenable: Hive.box<Contact>('contacts').listenable(),
@@ -106,7 +105,7 @@ class ContactsScreen extends ConsumerWidget {
                                                 width: 24,
                                                 height: 24,
                                                 colorFilter: ColorFilter.mode(
-                                                  Colors.red[300]!,
+                                                  const Color(0xFFE57373),
                                                   BlendMode.srcIn,
                                                 ),
                                               ),
@@ -123,10 +122,8 @@ class ContactsScreen extends ConsumerWidget {
                                                 height: 24,
                                                 colorFilter: ColorFilter.mode(
                                                   Theme.of(context)
-                                                              .brightness ==
-                                                          Brightness.dark
-                                                      ? Colors.white
-                                                      : Colors.grey[900]!,
+                                                      .colorScheme
+                                                      .onSurface,
                                                   BlendMode.srcIn,
                                                 ),
                                               ),
@@ -142,15 +139,18 @@ class ContactsScreen extends ConsumerWidget {
                                 },
                                 background: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.red[400],
+                                    color: Theme.of(context).colorScheme.error,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 8),
                                   alignment: Alignment.centerRight,
                                   padding: const EdgeInsets.only(right: 20),
-                                  child: const Icon(Icons.delete_outline,
-                                      color: Colors.white),
+                                  child: Icon(
+                                    Icons.delete_outline,
+                                    color:
+                                        Theme.of(context).colorScheme.onError,
+                                  ),
                                 ),
                                 onDismissed: (direction) {
                                   // Find the actual index in the box
@@ -164,9 +164,8 @@ class ContactsScreen extends ConsumerWidget {
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
                                   decoration: ShapeDecoration(
-                                    color: isDark
-                                        ? Colors.grey[800]
-                                        : Colors.white,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     shape: SquircleBorder(
                                         radius: BorderRadius.circular(24)),
                                   ),
@@ -186,9 +185,9 @@ class ContactsScreen extends ConsumerWidget {
                                               width: 20,
                                               height: 20,
                                               colorFilter: ColorFilter.mode(
-                                                isDark
-                                                    ? Colors.white
-                                                    : Colors.black,
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
                                                 BlendMode.srcIn,
                                               ),
                                             ),
@@ -204,9 +203,9 @@ class ContactsScreen extends ConsumerWidget {
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: isDark
-                                                          ? Colors.white
-                                                          : Colors.black,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
                                                       fontFamily: 'GeistMono',
                                                     ),
                                                   ),
@@ -219,10 +218,12 @@ class ContactsScreen extends ConsumerWidget {
                                                               .split(' ')[0],
                                                           style: TextStyle(
                                                             fontSize: 14,
-                                                            color: isDark
-                                                                ? Colors.white54
-                                                                : Colors
-                                                                    .grey[600],
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .onSurface
+                                                                .withOpacity(
+                                                                    0.54),
                                                             fontFamily:
                                                                 'GeistMono',
                                                           ),
@@ -232,9 +233,10 @@ class ContactsScreen extends ConsumerWidget {
                                                               ' ${contact.number.split(' ')[1]}',
                                                           style: TextStyle(
                                                             fontSize: 14,
-                                                            color: isDark
-                                                                ? Colors.white
-                                                                : Colors.black,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .onSurface,
                                                             fontFamily:
                                                                 'GeistMono',
                                                           ),
@@ -250,9 +252,10 @@ class ContactsScreen extends ConsumerWidget {
                                                   contact.createdAt),
                                               style: TextStyle(
                                                 fontSize: 14,
-                                                color: isDark
-                                                    ? Colors.white54
-                                                    : Colors.grey[600],
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withOpacity(0.54),
                                                 fontFamily: 'GeistMono',
                                               ),
                                             ),
@@ -292,75 +295,6 @@ class ContactsScreen extends ConsumerWidget {
     }
   }
 
-  void _showAddContactDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final phoneController = TextEditingController();
-    PhoneNumber? phoneNumber;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Temporary Contact'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Contact Name',
-                hintText: 'Enter name',
-              ),
-            ),
-            const SizedBox(height: 16),
-            IntlPhoneField(
-              controller: phoneController,
-              initialCountryCode: 'IN',
-              disableLengthCheck: true,
-              showCountryFlag: false,
-              dropdownIcon: const Icon(Icons.arrow_drop_down),
-              searchText: 'Search country',
-              style: Theme.of(context).textTheme.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (number) => phoneNumber = number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final name = nameController.text.trim();
-              final number = phoneNumber?.completeNumber ?? '';
-
-              if (name.isEmpty || number.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill all fields')),
-                );
-                return;
-              }
-
-              final contactsBox = Hive.box<Contact>('contacts');
-              contactsBox.add(Contact(
-                name: name,
-                number: number,
-                createdAt: DateTime.now(),
-              ));
-
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showContactOptions(BuildContext context, Contact contact, int index) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final box = Hive.box<Contact>('contacts');
@@ -387,8 +321,8 @@ class ContactsScreen extends ConsumerWidget {
               'assets/icons/delete_2_line.svg',
               width: 24,
               height: 24,
-              colorFilter: ColorFilter.mode(
-                Colors.red[300]!,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFFE57373),
                 BlendMode.srcIn,
               ),
             ),
