@@ -171,8 +171,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                                     const EdgeInsets.symmetric(horizontal: 80),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Theme.of(context).colorScheme.surface
-                                      : Theme.of(context).colorScheme.surface,
+                                      ? const Color(0xFF232323)
+                                      : const Color(0xFFFFFFFF),
                                   borderRadius: BorderRadius.circular(24),
                                 ),
                                 child: TabBar(
@@ -180,7 +180,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen>
                                   indicator: BoxDecoration(
                                     color: isDark
                                         ? const Color(0xFF151515)
-                                        : const Color(0xFFE8E8E8),
+                                        : const Color(0xFFE6E6E6),
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(

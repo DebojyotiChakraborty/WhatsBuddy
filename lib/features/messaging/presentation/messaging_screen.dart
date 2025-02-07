@@ -221,7 +221,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: ShapeDecoration(
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                     shape: SquircleBorder(radius: BorderRadius.circular(24)),
                   ),
                   child: Row(
@@ -271,7 +271,8 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                 child: CustomTextField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainer,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontFamily: 'GeistMono',
@@ -379,7 +380,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: ShapeDecoration(
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                     shape: SquircleBorder(radius: BorderRadius.circular(24)),
                   ),
                   child: Material(
@@ -476,15 +477,15 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen> {
                   'assets/icons/delete_2_line.svg',
                   width: 20,
                   height: 20,
-                  colorFilter: ColorFilter.mode(
-                    Colors.red[300]!,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFFE57373),
                     BlendMode.srcIn,
                   ),
                 ),
-                label: Text(
+                label: const Text(
                   'Delete History',
                   style: TextStyle(
-                    color: Colors.red[300],
+                    color: Color(0xFFE57373),
                     fontSize: 16,
                     fontFamily: 'Geist',
                   ),

@@ -102,7 +102,8 @@ class ContactsScreen extends ConsumerWidget {
                                                 'assets/icons/delete_2_line.svg',
                                                 width: 24,
                                                 height: 24,
-                                                colorFilter: const ColorFilter.mode(
+                                                colorFilter:
+                                                    const ColorFilter.mode(
                                                   Color(0xFFE57373),
                                                   BlendMode.srcIn,
                                                 ),
@@ -162,8 +163,9 @@ class ContactsScreen extends ConsumerWidget {
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
                                   decoration: ShapeDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainer,
                                     shape: SquircleBorder(
                                         radius: BorderRadius.circular(24)),
                                   ),
@@ -292,6 +294,7 @@ class ContactsScreen extends ConsumerWidget {
       return '${remaining.inSeconds}s';
     }
   }
+
 
   void _showContactOptions(BuildContext context, Contact contact, int index) {
     final isDark = Theme.of(context).brightness == Brightness.dark;

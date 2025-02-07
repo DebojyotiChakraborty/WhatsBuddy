@@ -140,7 +140,7 @@ class PreferencesScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: ShapeDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         shape: SquircleBorder(radius: BorderRadius.circular(24)),
       ),
       child: Material(
@@ -249,7 +249,7 @@ class PreferencesScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: ShapeDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         shape: SquircleBorder(radius: BorderRadius.circular(24)),
       ),
       child: Material(

@@ -30,7 +30,6 @@ class _FullScreenViewerState extends State<FullScreenViewer>
   late AnimationController _buttonAnimationController;
   bool _isVideoInitialized = false;
   bool _isDismissing = false;
-  final _spring = Spring.bouncy;
   bool _canDismiss = false;
 
   @override
@@ -213,9 +212,9 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
                               maxWidth:
-                                  MediaQuery.of(context).size.width * 0.85,
+                              MediaQuery.of(context).size.width * 0.85,
                               maxHeight:
-                                  MediaQuery.of(context).size.height * 0.7,
+                              MediaQuery.of(context).size.height * 0.7,
                             ),
                             child: DragDismissable(
                               child: KeyedSubtree(
@@ -224,27 +223,27 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                                   valueListenable: springNotifier,
                                   builder: (context, spring, _) =>
                                       ValueListenableBuilder<bool>(
-                                    valueListenable: adjustSpringTimingToRoute,
-                                    builder: (context, adjustToRoute, _) =>
-                                        ValueListenableBuilder<
-                                            HeroineShuttleBuilder>(
-                                      valueListenable: flightShuttleNotifier,
-                                      builder: (context, shuttleBuilder, _) =>
-                                          Heroine(
-                                        tag: widget.uri,
-                                        spring: spring,
-                                        adjustToRouteTransitionDuration:
-                                            adjustToRoute,
-                                        flightShuttleBuilder: shuttleBuilder,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.zero,
-                                          child: widget.isVideo
-                                              ? _buildVideoPlayer()
-                                              : _buildImage(),
-                                        ),
+                                        valueListenable: adjustSpringTimingToRoute,
+                                        builder: (context, adjustToRoute, _) =>
+                                            ValueListenableBuilder<
+                                                HeroineShuttleBuilder>(
+                                              valueListenable: flightShuttleNotifier,
+                                              builder: (context, shuttleBuilder, _) =>
+                                                  Heroine(
+                                                    tag: widget.uri,
+                                                    spring: spring,
+                                                    adjustToRouteTransitionDuration:
+                                                    adjustToRoute,
+                                                    flightShuttleBuilder: shuttleBuilder,
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.zero,
+                                                      child: widget.isVideo
+                                                          ? _buildVideoPlayer()
+                                                          : _buildImage(),
+                                                    ),
+                                                  ),
+                                            ),
                                       ),
-                                    ),
-                                  ),
                                 ),
                               ),
                             ),
@@ -277,7 +276,7 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                                         height: 24,
                                         colorFilter: ColorFilter.mode(
                                           Theme.of(context).brightness ==
-                                                  Brightness.dark
+                                              Brightness.dark
                                               ? Colors.white
                                               : Colors.grey[800]!,
                                           BlendMode.srcIn,
@@ -294,7 +293,7 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                                         height: 24,
                                         colorFilter: ColorFilter.mode(
                                           Theme.of(context).brightness ==
-                                                  Brightness.dark
+                                              Brightness.dark
                                               ? Colors.white
                                               : Colors.grey[800]!,
                                           BlendMode.srcIn,

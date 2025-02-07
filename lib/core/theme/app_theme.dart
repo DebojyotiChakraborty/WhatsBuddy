@@ -31,7 +31,10 @@ class AppTheme {
         onPrimary: _surfaceLight,
         secondary: _secondaryLight,
         onSecondary: _surfaceLight,
-        surface: _surfaceLight,
+        surface: _backgroundLight,
+        surfaceContainerHighest: _surfaceLight,
+        surfaceContainer: _surfaceLight,
+        surfaceTint: _surfaceLight,
         onSurface: _textLight,
       ),
       textTheme: TextTheme(
@@ -164,7 +167,10 @@ class AppTheme {
         onPrimary: _surfaceDark,
         secondary: _secondaryDark,
         onSecondary: _surfaceDark,
-        surface: _surfaceDark,
+        surface: _backgroundDark,
+        surfaceContainerHighest: _surfaceDark,
+        surfaceContainer: _surfaceDark,
+        surfaceTint: _surfaceDark,
         onSurface: _textDark,
       ),
       textTheme: TextTheme(

@@ -20,7 +20,7 @@ import 'features/status/data/status_repository.dart';
 
 final springNotifier = ValueNotifier(Spring.bouncy);
 final flightShuttleNotifier =
-    ValueNotifier<HeroineShuttleBuilder>(const FlipShuttleBuilder());
+ValueNotifier<HeroineShuttleBuilder>(const FlipShuttleBuilder());
 final adjustSpringTimingToRoute = ValueNotifier(false);
 
 void main() async {
@@ -64,23 +64,23 @@ class MyApp extends ConsumerWidget {
           statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
           systemNavigationBarColor: Colors.transparent,
           systemNavigationBarIconBrightness:
-              isDark ? Brightness.light : Brightness.dark,
+          isDark ? Brightness.light : Brightness.dark,
         ));
         return child!;
       },
       initialRoute: '/',
       routes: {
         '/': (context) => FutureBuilder<bool>(
-              future: _checkFirstLaunch(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return snapshot.data == true
-                    ? const OnboardingScreen()
-                    : const HomeNavigator();
-              },
-            ),
+          future: _checkFirstLaunch(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return snapshot.data == true
+                ? const OnboardingScreen()
+                : const HomeNavigator();
+          },
+        ),
         '/messaging': (context) => const MessagingScreen(),
       },
     );
