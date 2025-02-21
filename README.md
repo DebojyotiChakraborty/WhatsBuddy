@@ -14,9 +14,9 @@
 
 Watch the demo video to see WhatsBuddy in action:
 
-[![WhatsBuddy Demo Video](demo/screen-recording-demo.mp4)](demo/screen-recording-demo.mp4)
-
----
+<div align="center">
+<video src="https://github.com/user-attachments/assets/4e2b8a8c-0419-4c7a-a694-f8ad5485bbd2" autoplay muted loop />
+</div>
 
 ## ✨ Features
 
