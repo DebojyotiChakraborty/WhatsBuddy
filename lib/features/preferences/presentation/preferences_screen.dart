@@ -37,9 +37,7 @@ class PreferencesScreen extends ConsumerWidget {
                       style: Theme.of(context)
                           .extension<AppThemeExtension>()
                           ?.secondaryText
-                          .copyWith(
-                            height: 1.4,
-                          ),
+                          .copyWith(height: 1.4),
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -71,7 +69,8 @@ class PreferencesScreen extends ConsumerWidget {
                     title: 'Github Repository',
                     subtitle: 'Review the codebase',
                     onTap: () => _launchURL(
-                        'https://github.com/DebojyotiChakraborty/WhatsBuddy'),
+                      'https://github.com/DebojyotiChakraborty/WhatsBuddy',
+                    ),
                   ),
                   _buildPreferenceCard(
                     context,
@@ -88,23 +87,19 @@ class PreferencesScreen extends ConsumerWidget {
                   const SizedBox(height: 60),
                   Center(
                     child: GestureDetector(
-                      onTap: () => _launchURL('https://x.com/Pseudo_Maverick'),
+                      onTap: () => _launchURL('https://debojyoticodes.in'),
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           style: Theme.of(context)
                               .extension<AppThemeExtension>()
                               ?.secondaryText
-                              .copyWith(
-                                height: 1.5,
-                              ),
+                              .copyWith(height: 1.5),
                           children: [
                             const TextSpan(text: 'Made with '),
                             const TextSpan(
                               text: '❤️',
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
+                              style: TextStyle(fontSize: 14),
                             ),
                             const TextSpan(text: ' and Flutter by '),
                             WidgetSpan(
@@ -134,7 +129,10 @@ class PreferencesScreen extends ConsumerWidget {
   }
 
   Widget _buildAppearanceCard(
-      BuildContext context, WidgetRef ref, ThemeMode currentTheme) {
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode currentTheme,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -206,10 +204,9 @@ class PreferencesScreen extends ConsumerWidget {
                         _getThemeModeText(currentTheme),
                         style: TextStyle(
                           fontSize: 16,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.54),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.54),
                           fontFamily: 'GeistMono',
                         ),
                       ),
@@ -219,10 +216,9 @@ class PreferencesScreen extends ConsumerWidget {
                         width: 28,
                         height: 28,
                         colorFilter: ColorFilter.mode(
-                          Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.54),
+                          Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.54),
                           BlendMode.srcIn,
                         ),
                       ),
@@ -291,10 +287,9 @@ class PreferencesScreen extends ConsumerWidget {
                           subtitle,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.54),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.54),
                             fontFamily: 'GeistMono',
                           ),
                         ),
