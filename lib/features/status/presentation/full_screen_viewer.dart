@@ -67,10 +67,9 @@ class _FullScreenViewerState extends State<FullScreenViewer>
     }
   }
 
-  Future<bool> _onWillPop() async {
+  void _handlePop(bool didPop, Object? result) {
+    if (didPop) return;
     _startDismissing();
-    await Future.delayed(const Duration(milliseconds: 50));
-    return true;
   }
 
   @override
@@ -133,7 +132,9 @@ class _FullScreenViewerState extends State<FullScreenViewer>
           .invokeMethod<Uint8List>('getFileBytes', {'uri': widget.uri});
       await tempFile.writeAsBytes(bytes ?? Uint8List(0));
 
-      await Share.shareXFiles([XFile(tempFile.path)]);
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(tempFile.path)]),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -168,8 +169,9 @@ class _FullScreenViewerState extends State<FullScreenViewer>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: _handlePop,
       child: ReactToHeroineDismiss(
         builder: (context, progress, offset, child) {
           final actualProgress = _canDismiss ? progress : 0.0;
@@ -219,29 +221,23 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                             child: DragDismissable(
                               child: KeyedSubtree(
                                 key: ValueKey(widget.uri),
-                                child: ValueListenableBuilder<Spring>(
-                                  valueListenable: springNotifier,
-                                  builder: (context, spring, _) =>
-                                      ValueListenableBuilder<bool>(
-                                        valueListenable: adjustSpringTimingToRoute,
-                                        builder: (context, adjustToRoute, _) =>
-                                            ValueListenableBuilder<
-                                                HeroineShuttleBuilder>(
-                                              valueListenable: flightShuttleNotifier,
-                                              builder: (context, shuttleBuilder, _) =>
-                                                  Heroine(
-                                                    tag: widget.uri,
-                                                    spring: spring,
-                                                    adjustToRouteTransitionDuration:
-                                                    adjustToRoute,
-                                                    flightShuttleBuilder: shuttleBuilder,
-                                                    child: ClipRRect(
-                                                      borderRadius: BorderRadius.zero,
-                                                      child: widget.isVideo
-                                                          ? _buildVideoPlayer()
-                                                          : _buildImage(),
-                                                    ),
-                                                  ),
+                                child: ValueListenableBuilder<Motion>(
+                                  valueListenable: motionNotifier,
+                                  builder: (context, motion, _) =>
+                                      ValueListenableBuilder<
+                                          HeroineShuttleBuilder>(
+                                        valueListenable: flightShuttleNotifier,
+                                        builder: (context, shuttleBuilder, _) =>
+                                            Heroine(
+                                              tag: widget.uri,
+                                              motion: motion,
+                                              flightShuttleBuilder: shuttleBuilder,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.zero,
+                                                child: widget.isVideo
+                                                    ? _buildVideoPlayer()
+                                                    : _buildImage(),
+                                              ),
                                             ),
                                       ),
                                 ),

@@ -27,7 +27,7 @@ class StatusFileHelper(private val context: Context) {
     }
 
     private fun isMediaFile(fileName: String): Boolean {
-        val lowercase = fileName.toLowerCase()
+        val lowercase = fileName.lowercase()
         return lowercase.endsWith(".jpg") ||
                lowercase.endsWith(".jpeg") ||
                lowercase.endsWith(".png") ||
