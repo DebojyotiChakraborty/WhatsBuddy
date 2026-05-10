@@ -373,11 +373,12 @@ class ContactsScreen extends ConsumerWidget {
   Future<void> _saveToDeviceContacts(
       BuildContext context, Contact contact) async {
     try {
-      final newContact = fc.Contact()
-        ..name.first = contact.name
-        ..phones.add(fc.Phone(contact.number));
+      final newContact = fc.Contact(
+        name: fc.Name(first: contact.name),
+        phones: [fc.Phone(number: contact.number)],
+      );
 
-      await fc.FlutterContacts.openExternalInsert(newContact);
+      await fc.FlutterContacts.native.showCreator(contact: newContact);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to open contacts app')),
